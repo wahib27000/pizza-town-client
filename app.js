@@ -283,7 +283,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const totalCalculé = panier.reduce((acc, item) => acc + item.prix, 0);
 
-            // CORRECTION DES CHAMPS POUR CORRESPONDRE EXACTEMENT À MONGOOSE
             const nouvelleCommande = {
                 items: panier,
                 total: totalCalculé,
@@ -302,12 +301,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 if (response.ok) {
-                    alert("Commande validée avec succès ! Merci pour votre commande 🍕");
+                    const commandeEnregistree = await response.json();
+                    localStorage.setItem('derniereCommande', JSON.stringify(commandeEnregistree));
+                    
                     panier = [];
                     mettreAJourPanier();
+                    
                     if (modalCheckout) modalCheckout.classList.add('cache');
                     if (panneauPanier) panneauPanier.classList.add('cache');
-                    formCommande.reset();
+                    
+                    window.location.href = 'confirmation.html';
                 } else {
                     alert("Erreur lors de la validation de la commande.");
                 }

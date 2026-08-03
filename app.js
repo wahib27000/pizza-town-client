@@ -40,7 +40,6 @@ function afficherMenu(categorieFiltre = 'tous') {
         carte.classList.add('pizza-card');
         carte.style.position = 'relative';
         
-        // Calcul du Badge NEW (Valable 3 semaines / 21 jours)
         let badgeNewHTML = '';
         if (produit.createdAt) {
             const dateCreation = new Date(produit.createdAt);
@@ -284,16 +283,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const totalCalculé = panier.reduce((acc, item) => acc + item.prix, 0);
 
+            // CORRECTION DES CHAMPS POUR CORRESPONDRE EXACTEMENT À MONGOOSE
             const nouvelleCommande = {
                 items: panier,
                 total: totalCalculé,
                 mode: modeCommandeActuel,
-                client: {
-                    nom,
-                    telephone,
-                    ville: modeCommandeActuel === 'livraison' ? ville : 'À emporter',
-                    heureRetrait: modeCommandeActuel === 'emporter' ? heureRetrait : 'Immédiat'
-                }
+                customerName: nom,
+                phone: telephone,
+                address: modeCommandeActuel === 'livraison' ? ville : 'À emporter (Sur place)',
+                heureRetrait: modeCommandeActuel === 'emporter' ? heureRetrait : 'Immédiat'
             };
 
             try {

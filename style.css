@@ -1,0 +1,1156 @@
+/* =========================================
+   1. VARIABLES (Thème Clair & Italien)
+   ========================================= */
+:root {
+  --rouge-tomate: #E63946;
+  --vert-basilic: #2E5C31;
+  --blanc-creme: #F7F4EF;
+  --texte-sombre: #2B2D42;
+  --gris-clair: #E5E5E5;
+  --ombre: rgba(0, 0, 0, 0.08);
+}
+
+/* =========================================
+   2. RESET BASIQUE
+   ========================================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: var(--blanc-creme);
+  color: var(--texte-sombre);
+}
+
+/* =========================================
+   3. EN-TÊTE (Barre de navigation)
+   ========================================= */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background-color: white;
+  box-shadow: 0 4px 15px var(--ombre);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo h1 {
+  color: var(--rouge-tomate);
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: -1px;
+}
+
+.cart-btn {
+  background-color: var(--vert-basilic);
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 30px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.cart-btn:active {
+  transform: scale(0.95);
+}
+
+/* =========================================
+   4. BANNIÈRE PROMO
+   ========================================= */
+.hero-banner {
+  background-color: var(--rouge-tomate);
+  color: white;
+  padding: 30px 20px;
+  text-align: center;
+  margin: 20px;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(230, 57, 70, 0.3);
+}
+
+/* =========================================
+   5. BARRE DE CATEGORIES
+   ========================================= */
+.categories-bar {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 10px 20px;
+  background-color: white;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 5px var(--ombre);
+}
+
+.cat-btn {
+  background-color: var(--blanc-creme);
+  color: var(--texte-sombre);
+  border: 1px solid var(--gris-clair);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.cat-btn.active, .cat-btn:hover {
+  background-color: var(--rouge-tomate);
+  color: white;
+  border-color: var(--rouge-tomate);
+}
+
+/* =========================================
+   6. MENU & GRILLE PRODUITS
+   ========================================= */
+main {
+  padding: 20px;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.pizza-card {
+  background: white;
+  border-radius: 15px;
+  padding: 15px;
+  box-shadow: 0 4px 10px var(--ombre);
+  text-align: left;
+}
+
+/* Nouvelle carte produit immersive */
+.product-card, .pizza-card {
+    background: #ffffff;
+    border-radius: 16px;
+    overflow: hidden; /* Cache tout ce qui dépasse pour un effet propre */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover, .pizza-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+}
+
+/* Image en plein format en haut de la carte */
+.product-card img, .pizza-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover; /* L'image remplit tout l'espace sans bandes grises */
+    transition: transform 0.5s ease; /* Prépare l'effet zoom */
+}
+
+/* Effet zoom ultra-stylé quand la souris passe sur la carte */
+.product-card:hover img, .pizza-card:hover img {
+    transform: scale(1.05);
+}
+
+/* Zone du texte à l'intérieur de la carte */
+.product-card h3, .pizza-card h3, 
+.product-card .pizza-nom, .pizza-card .pizza-nom {
+    padding: 15px 15px 5px 15px;
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+.product-card .category {
+    padding: 0 15px;
+    font-size: 0.8rem;
+    color: #888;
+    text-transform: uppercase;
+}
+
+/* Ajustement pour le bouton d'ajout en bas de carte */
+.product-card .add-btn, .pizza-card .add-btn {
+    margin: 15px;
+    width: calc(100% - 30px);
+}
+
+.pizza-nom {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.pizza-prix {
+  color: var(--rouge-tomate);
+  font-weight: bold;
+  margin: 5px 0 15px 0;
+}
+
+.add-btn {
+  background-color: white;
+  color: var(--rouge-tomate);
+  border: 2px solid var(--rouge-tomate);
+  padding: 10px;
+  width: 100%;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.add-btn:active {
+  background-color: var(--rouge-tomate);
+  color: white;
+}
+
+/* =========================================
+   7. PANNEAU LATÉRAL (Panier)
+   ========================================= */
+.sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100%;
+  max-width: 400px;
+  height: 100vh;
+  background-color: white;
+  box-shadow: -5px 0 20px var(--ombre);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease-in-out;
+  z-index: 200;
+}
+
+.cache {
+  transform: translateX(100%);
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background-color: var(--blanc-creme);
+  border-bottom: 1px solid var(--gris-clair);
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--texte-sombre);
+  cursor: pointer;
+}
+
+#liste-articles-panier {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.sidebar-footer {
+  padding: 20px;
+  background-color: white;
+  border-top: 1px solid var(--gris-clair);
+}
+
+.total-ligne {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.pay-btn {
+  background-color: var(--vert-basilic);
+  color: white;
+  border: none;
+  width: 100%;
+  padding: 15px;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* =========================================
+   8. ADAPTATION PC / TABLETTES
+   ========================================= */
+@media (min-width: 768px) {
+  .menu-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.product-card, .pizza-card {
+    animation: fadeIn 0.4s ease-out forwards;
+}
+.product-card, .pizza-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover, .pizza-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
+.add-btn, .cart-btn, .cat-btn {
+    transition: transform 0.15s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.add-btn:active, .cart-btn:active, .cat-btn:active {
+    transform: scale(0.95);
+}
+/* Animation au survol et au clic pour les boutons d'ajout */
+.add-btn {
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+}
+
+/* Effet quand la souris passe dessus (Hover) */
+.add-btn:hover {
+    transform: translateY(-2px) scale(1.02);
+    background-color: var(--rouge-tomate);
+    color: white;
+    box-shadow: 0 6px 15px rgba(230, 57, 70, 0.3);
+}
+
+/* Effet au clic (Active) */
+.add-btn:active {
+    transform: translateY(0) scale(0.97);
+    box-shadow: 0 2px 5px rgba(230, 57, 70, 0.2);
+}
+/* =========================================
+   CARROUSEL PROMOTIONNEL
+   ========================================= */
+.promo-carousel {
+    position: relative;
+    background: linear-gradient(135deg, var(--rouge-tomate), #c1121f);
+    color: white;
+    padding: 30px 20px;
+    margin: 20px;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(230, 57, 70, 0.35);
+    overflow: hidden;
+    text-align: center;
+    min-height: 130px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.carousel-track {
+    position: relative;
+    width: 100%;
+}
+
+.carousel-slide {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.6s ease-in-out;
+}
+
+.carousel-slide.active {
+    display: block;
+    opacity: 1;
+    animation: slideIn 0.5s ease-out forwards;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(10px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.promo-badge {
+    display: inline-block;
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+}
+
+.carousel-slide h3 {
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin-bottom: 5px;
+}
+
+.carousel-slide p {
+    font-size: 1rem;
+    opacity: 0.95;
+}
+
+/* Les points de navigation en bas */
+.carousel-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.dot.active {
+    background-color: white;
+    transform: scale(1.3);
+}
+@keyframes bounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.25); }
+}
+
+.cart-btn.pulse {
+    animation: bounce 0.4s ease-in-out;
+}
+.cat-btn {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cat-btn.active {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(230, 57, 70, 0.25);
+}
+.add-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.add-btn::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%);
+    transform-origin: 50% 50%;
+}
+
+.add-btn:active::after {
+    animation: ripple 0.4s ease-out;
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(0, 0);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(40, 40);
+        opacity: 0;
+    }
+}
+@keyframes flyToCart {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(0.3) translateY(-150px);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(0.1) translateY(-300px);
+        opacity: 0;
+    }
+}
+
+.product-card.flying {
+    animation: flyToCart 0.6s cubic-bezier(0.2, 1, 0.3, 1) forwards;
+    pointer-events: none;
+}
+@keyframes flyToCart {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(0.2) translateY(-200px) translateX(100px);
+        opacity: 0.6;
+    }
+    100% {
+        transform: scale(0.05) translateY(-400px) translateX(200px);
+        opacity: 0;
+    }
+}
+
+.product-card.flying, .pizza-card.flying {
+    animation: flyToCart 0.6s cubic-bezier(0.2, 1, 0.3, 1) forwards;
+    z-index: 1000;
+    pointer-events: none;
+}
+@keyframes flyToCartDynamic {
+    0% {
+        transform: scale(1) translate(0, 0);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(0.3);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(0.05) translate(var(--translate-x), var(--translate-y));
+        opacity: 0;
+    }
+}
+
+.product-card.flying, .pizza-card.flying {
+    animation: flyToCartDynamic 0.6s cubic-bezier(0.2, 1, 0.3, 1) forwards;
+    z-index: 1000;
+    pointer-events: none;
+    position: relative;
+}
+#input-recherche:focus {
+    border-color: #E63946; /* Utilise la couleur principale de ton thème */
+    box-shadow: 0 4px 12px rgba(230, 57, 70, 0.15);
+}
+
+@keyframes toastAnim {
+    0% { transform: translateY(100px); opacity: 0; }
+    15% { transform: translateY(0); opacity: 1; }
+    85% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(100px); opacity: 0; }
+}
+
+.toast-notification {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    background: #111;
+    color: #fff;
+    padding: 14px 22px;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 500;
+    z-index: 10000;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    border-left: 4px solid #E63946; /* Rappel de ta couleur de thème */
+    animation: toastAnim 2.5s ease forwards;
+}
+/* Style global de la liste dans le panier */
+#liste-articles-panier {
+    padding: 15px;
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}
+
+/* Ligne d'un article dans le panier */
+.panier-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f9f9f9;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #eee;
+}
+
+.panier-item-infos {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.panier-item-nom {
+    font-weight: 600;
+    color: #222;
+    font-size: 0.95rem;
+}
+
+.panier-item-prix {
+    color: #E63946;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+/* Bouton supprimer propre */
+.panier-btn-supprimer {
+    background: #ffeeee;
+    border: none;
+    color: #E63946;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.panier-btn-supprimer:hover {
+    background: #E63946;
+    color: white;
+}
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 20000;
+}
+
+.modal-overlay.cache {
+    display: none;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 450px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    outline: none;
+}
+
+.submit-order-btn {
+    width: 100%;
+    background: #2D6A4F;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.2s;
+}
+
+.submit-order-btn:hover {
+    background: #1B4332;
+}
+/* --- MODE NUIT PRO --- */
+body.dark-mode {
+    background-color: #121212 !important;
+    color: #f1f1f1 !important;
+}
+
+body.dark-mode header,
+body.dark-mode .pizza-card,
+body.dark-mode .modal-content,
+body.dark-mode footer {
+    background-color: #1e1e1e !important;
+    color: #f1f1f1 !important;
+    border-color: #333 !important;
+}
+
+body.dark-mode .pizza-nom, 
+body.dark-mode h1, 
+body.dark-mode h2, 
+body.dark-mode h3, 
+body.dark-mode h4 {
+    color: #ffffff !important;
+}
+
+body.dark-mode p, 
+body.dark-mode span:not(.pizza-prix) {
+    color: #b0b0b0 !important;
+}
+
+/* Ajustement des boutons de taille en mode nuit */
+body.dark-mode .taille-selector label {
+    background: #2d2d2d !important;
+    color: #ccc !important;
+    border: 1px solid #444;
+}
+
+body.dark-mode .taille-selector label span {
+    color: #888 !important;
+}
+
+body.dark-mode .taille-selector label.taille-active,
+body.dark-mode .taille-selector input:checked + span {
+    background: #E63946 !important;
+    color: white !important;
+}
+
+body.dark-mode input[type="text"], 
+body.dark-mode input[type="tel"], 
+body.dark-mode select {
+    background-color: #2d2d2d !important;
+    color: white !important;
+    border-color: #444 !important;
+}
+/* --- CORRECTIONS MODE NUIT (Panneau panier & Boutons de taille) --- */
+body.dark-mode #panneau-panier {
+    background-color: #1e1e1e !important;
+    color: #f1f1f1 !important;
+}
+
+body.dark-mode .panier-item {
+    background-color: #2d2d2d !important;
+    border-color: #444 !important;
+}
+
+body.dark-mode .panier-item-nom,
+body.dark-mode .panier-item-prix {
+    color: #f1f1f1 !important;
+}
+
+/* Forcer le bouton rouge actif peu importe le mode */
+.taille-selector label.taille-active {
+    background: #E63946 !important;
+    color: white !important;
+}
+.taille-selector label.taille-active span {
+    color: #ffe5e7 !important;
+}
+.contact-horaires-card {
+    background: #181818;
+    color: #f1f1f1;
+    border: 1px solid #2a2a2a;
+    border-radius: 12px;
+    padding: 25px 30px;
+    width: 100%; /* S'étale sur toute la largeur disponible comme la carte Maps */
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    margin-bottom: 20px; /* Espace avant la carte Maps */
+}
+
+.contact-horaires-card .card-section {
+    flex: 1;
+    min-width: 250px;
+}
+
+.contact-horaires-card h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.4rem;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+}
+
+.contact-horaires-card h4 {
+    margin: 0 0 12px 0;
+    font-size: 1rem;
+    color: #E63946;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.card-section .adresse {
+    color: #aaa;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    margin-bottom: 8px;
+}
+
+.card-section .telephone {
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 1rem;
+    margin: 0;
+}
+
+/* Ligne de séparation verticale entre les infos et les horaires sur grand écran */
+.divider-vertical {
+    width: 1px;
+    background: #2a2a2a;
+    align-self: stretch;
+}
+
+.horaires-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.horaires-list li {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+    color: #ccc;
+    gap: 15px;
+}
+
+.horaires-list li span:first-child {
+    font-weight: 500;
+    color: #ffffff;
+}
+
+.horaires-list li span:last-child {
+    color: #aaa;
+    text-align: right;
+}
+
+/* Adaptation automatique sur mobile (passe en colonne si l'écran est trop étroit) */
+@media (max-width: 768px) {
+    .contact-horaires-card {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .divider-vertical {
+        width: 100%;
+        height: 1px;
+    }
+}
+/* =========================================
+   🍕 MODALE PIZZA BUILDER (SUR-MESURE)
+========================================= */
+.builder-modal-content {
+    background: white;
+    color: #333;
+    padding: 30px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 550px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.builder-title {
+    margin-top: 0;
+    color: #111;
+    margin-bottom: 20px;
+}
+
+.builder-section {
+    margin: 15px 0;
+}
+
+.builder-label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.builder-select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    outline: none;
+    transition: 0.3s;
+}
+
+.builder-select:focus {
+    border-color: #E63946;
+}
+
+/* Grille des ingrédients */
+.ingredients-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 10px;
+}
+
+.ingredient-btn {
+    display: block;
+    border: 2px solid #ddd;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s ease-in-out;
+    user-select: none;
+    background: transparent;
+    color: inherit;
+}
+
+/* On cache la petite case à cocher native */
+.ingredient-btn input {
+    display: none; 
+}
+
+/* L'état quand on clique sur l'ingrédient */
+.ingredient-btn.active {
+    border-color: #E63946;
+    background: rgba(230, 57, 70, 0.08);
+    color: #E63946;
+    font-weight: bold;
+}
+
+/* Boutons d'action */
+.builder-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.btn-valider-builder {
+    flex: 1;
+    background: #E63946;
+    padding: 15px;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: 0.2s;
+}
+
+.btn-valider-builder:hover {
+    opacity: 0.9;
+}
+
+.btn-annuler-builder {
+    background: #666;
+    padding: 15px;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-annuler-builder:hover {
+    background: #555;
+}
+/* =========================================
+   ANIMATIONS PREMIUM (MARQUEE & BOUTON)
+========================================= */
+
+/* --- 1. Bandeau Marquee --- */
+.marquee-container {
+    width: 100%;
+    background: #111; /* Fond sombre classe */
+    color: #fff;
+    padding: 10px 0;
+    overflow: hidden;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.marquee-content {
+    display: inline-block;
+    animation: scrollMarquee 20s linear infinite; /* 20s = Vitesse de défilement */
+}
+
+/* Espace entre les phrases */
+.marquee-content span {
+    padding-right: 50px;
+}
+
+@keyframes scrollMarquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); } 
+}
+
+/* --- 2. Bouton d'ajout Micro-interactif --- */
+.add-btn {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 42px; /* Hauteur fixe pour éviter que ça saute */
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    overflow: hidden;
+}
+
+/* État "Chargement" (Le bouton se rétracte en rond) */
+.add-btn.loading {
+    width: 42px !important;
+    border-radius: 50%;
+    color: transparent !important;
+    pointer-events: none; /* Empêche de cliquer deux fois */
+    background-color: #666 !important;
+    margin: 0 auto;
+}
+
+/* Le petit cercle qui tourne à l'intérieur */
+.add-btn.loading::after {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spinButton 0.6s linear infinite;
+}
+
+@keyframes spinButton {
+    to { transform: rotate(360deg); }
+}
+
+/* État "Succès" (Vert + Rebond) */
+.add-btn.success {
+    background-color: #2a9d8f !important; /* Vert succès */
+    color: white !important;
+    pointer-events: none;
+    animation: bounceButton 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes bounceButton {
+    0% { transform: scale(0.9); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+/* =========================================
+   BUILDER VISUEL (PIZZA EN DIRECT)
+========================================= */
+
+.pizza-visual-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.pizza-layer {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease;
+    pointer-events: none;
+}
+
+/* Le calque actif devient visible */
+.pizza-layer.active {
+    opacity: 1;
+}
+
+/* 1. La pâte à pizza */
+.pate {
+    position: relative;
+    width: 220px;
+    height: 220px;
+    background: #e8c396;
+    border: 12px solid #d4a373;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.1), 0 10px 20px rgba(0,0,0,0.15);
+    opacity: 1; /* La pâte est toujours visible */
+    overflow: hidden; /* Empêche les ingrédients de déborder de la croûte */
+}
+
+/* 2. Les sauces */
+.sauce {
+    transform: scale(0.95);
+}
+.sauce.tomate { background: #cf3125; }
+.sauce.creme { background: #fdf5e6; }
+
+/* 3. Les ingrédients (Motifs CSS pour simuler la nourriture) */
+.ingredient {
+    transform: scale(0.92);
+}
+
+.mozza {
+    background: radial-gradient(circle, rgba(255,255,255,0.9) 15%, transparent 16%), 
+                radial-gradient(circle, rgba(255,255,255,0.8) 10%, transparent 11%);
+    background-size: 50px 50px;
+    background-position: 0 0, 25px 25px;
+}
+
+.viande {
+    background: radial-gradient(circle, #5c4033 12%, transparent 13%);
+    background-size: 40px 40px;
+    background-position: 10px 10px;
+}
+
+.champis {
+    background: radial-gradient(ellipse, #b5b5b5 12%, transparent 13%);
+    background-size: 45px 45px;
+    background-position: 5px 15px;
+}
+
+.poulet {
+    background: radial-gradient(circle, #dca85b 12%, transparent 13%);
+    background-size: 35px 35px;
+    background-position: 15px 5px;
+}
+
+.poivrons {
+    background: radial-gradient(circle, #4caf50 10%, transparent 11%);
+    background-size: 40px 40px;
+    background-position: 0 20px;
+}
+
+.oignons {
+    background: radial-gradient(circle, transparent 8%, #9c27b0 9%, #9c27b0 11%, transparent 12%);
+    background-size: 45px 45px;
+    background-position: 20px 20px;
+}
+
+.chevre {
+    background: radial-gradient(circle, #ffffff 18%, #cccccc 20%, transparent 21%);
+    background-size: 60px 60px;
+    background-position: 5px 5px;
+}
+
+.miel {
+    background: radial-gradient(circle, rgba(255, 193, 7, 0.7) 15%, transparent 20%);
+    background-size: 70px 70px;
+    background-position: 10px 30px;
+}

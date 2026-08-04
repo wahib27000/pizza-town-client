@@ -1154,3 +1154,174 @@ body.dark-mode .panier-item-prix {
     background-size: 70px 70px;
     background-position: 10px 30px;
 }
+/* Importation des polices modernes depuis Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Poppins:wght@300;400;600&display=swap');
+
+:root {
+    --primary: #E63946; /* Ton rouge vif signature */
+    --primary-hover: #d62828;
+    --bg-light: #fdfdfd;
+    --text-light: #333;
+    --card-bg-light: #ffffff;
+}
+
+/* Le fameux "vrai" mode sombre (Gris texturé, pas de noir pur) */
+body.dark-mode {
+    --bg-light: #18181b; /* Gris très profond (ZINC 900) */
+    --text-light: #f1f1f1;
+    --card-bg-light: #27272a; /* Gris carte (ZINC 800) */
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-light);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Titres percutants façon pizzeria urbaine */
+h1, h2, h3, h4, .pizza-nom {
+    font-family: 'Oswald', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.pizza-card {
+    background: var(--card-bg-light);
+    border-radius: 16px;
+    overflow: hidden; /* Garde l'image dans les bords arrondis lors du zoom */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(0,0,0,0.02);
+}
+
+body.dark-mode .pizza-card {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Effet de profondeur au survol de la carte */
+.pizza-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+body.dark-mode .pizza-card:hover {
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+}
+
+/* Animation de l'image (Léger Zoom) */
+.pizza-card img {
+    width: 100%;
+    border-radius: 12px;
+    transition: transform 0.4s ease;
+    object-fit: cover;
+}
+
+.pizza-card:hover img {
+    transform: scale(1.05); /* Le zoom appétissant */
+}
+
+/* Le bouton "Ajouter au panier" stylé */
+.add-btn {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+}
+
+/* Ajout automatique d'une icône caddie dans le bouton */
+.add-btn::before {
+    content: '🛒';
+    font-size: 1.1rem;
+}
+
+.add-btn:hover {
+    background-color: var(--primary-hover);
+}
+
+.add-btn:active {
+    transform: scale(0.95); /* Le bouton s'enfonce quand on clique ! */
+}
+/* Filtres qui restent collés en haut de l'écran */
+.menu-categories {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background-color: rgba(253, 253, 253, 0.95);
+    backdrop-filter: blur(10px); /* Effet de verre flouté style iOS */
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+body.dark-mode .menu-categories {
+    background-color: rgba(24, 24, 27, 0.95);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+/* Design des boutons de filtre (pilules) */
+.cat-btn {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    border-radius: 25px;
+    padding: 8px 18px;
+    border: 1px solid #ccc;
+    transition: all 0.2s;
+    background: transparent;
+    cursor: pointer;
+}
+
+body.dark-mode .cat-btn {
+    color: var(--text-light);
+    border-color: #444;
+}
+
+.cat-btn.active {
+    background-color: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+/* LE PANIER OMNIPRÉSENT */
+#btn-ouvrir-panier {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1000;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 16px 28px;
+    box-shadow: 0 8px 25px rgba(230, 57, 70, 0.5);
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+#btn-ouvrir-panier:hover {
+    transform: scale(1.05) translateY(-5px);
+    box-shadow: 0 12px 30px rgba(230, 57, 70, 0.6);
+}
+
+#btn-ouvrir-panier:active {
+    transform: scale(0.95); /* Effet clic */
+}

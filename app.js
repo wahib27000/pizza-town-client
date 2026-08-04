@@ -147,7 +147,7 @@ if (inputRecherche) {
 }
 
 // ==========================================
-// 5. GESTION DU PANIER & PROMOTIONS
+// 5. GESTION DU PANIER & PROMOTIONS (AVEC ANIMATIONS)
 // ==========================================
 function ajouterAuPanier(idProduit, btnElement) {
     const produitTrouve = produits.find(p => p._id === idProduit);
@@ -177,7 +177,25 @@ function ajouterAuPanier(idProduit, btnElement) {
 
     panier.push({ nom: nomFinal, prix: prixFinal, prixOriginal: prixFinal });
     mettreAJourPanier();
-    afficherNotification(`✓ ${nomFinal} ajouté au panier !`);
+
+    // --- ANIMATION 4 : BOUTON SUCCÈS ---
+    const texteOriginal = btnElement.innerHTML;
+    btnElement.classList.add('success');
+    btnElement.innerHTML = "✓ Ajouté !";
+
+    setTimeout(() => {
+        btnElement.classList.remove('success');
+        btnElement.innerHTML = texteOriginal;
+    }, 1000);
+
+    // --- ANIMATION 2 : REBOND ÉLASTIQUE DU PANIER ---
+    const boutonPanierFlottant = document.getElementById('btn-ouvrir-panier');
+    if (boutonPanierFlottant) {
+        boutonPanierFlottant.classList.add('panier-pulse');
+        setTimeout(() => {
+            boutonPanierFlottant.classList.remove('panier-pulse');
+        }, 600);
+    }
 }
 
 function appliquerPromosAutomatiques(itemsPanier) {
@@ -349,10 +367,8 @@ function lancerTrackerDeCommande(idCommande) {
     const modal = document.getElementById('modal-tracker');
     if (!modal) return;
     
-    // 1. On affiche la modale
     modal.classList.remove('cache');
     
-    // 2. On lance une requête vers le backend toutes les 5 secondes
     intervalSuivi = setInterval(async () => {
         try {
             const res = await fetch(`${API_URL}/api/orders/${idCommande}`);
@@ -370,13 +386,11 @@ function mettreAJourVisuelTracker(statutAdmin) {
     if (!statutAdmin) return;
     const statut = statutAdmin.toLowerCase();
 
-    // 1. Si l'admin clique sur "En préparation" ou "En cours"
     if (statut.includes('préparation') || statut.includes('preparation') || statut.includes('cours')) {
         document.getElementById('step-2').style.color = "var(--success)";
         document.getElementById('step-2').innerHTML = "&#10004; En cours de préparation";
     }
     
-    // 2. Si l'admin clique sur "Au four"
     if (statut.includes('four')) {
         document.getElementById('step-2').style.color = "var(--success)";
         document.getElementById('step-2').innerHTML = "&#10004; En cours de préparation";
@@ -384,7 +398,6 @@ function mettreAJourVisuelTracker(statutAdmin) {
         document.getElementById('step-3').innerHTML = "&#10004; Au four";
     }
     
-    // 3. Si l'admin clique sur "Prête" ou "Livrée"
     if (statut.includes('prêt') || statut.includes('prete') || statut.includes('prête') || statut.includes('livré') || statut.includes('livree')) {
         document.getElementById('step-2').style.color = "var(--success)";
         document.getElementById('step-2').innerHTML = "&#10004; En cours de préparation";
@@ -404,33 +417,8 @@ function fermerTracker() {
 }
 
 // ==========================================
-// 9. ANIMATIONS (VOL PANIER, NOTIFICATIONS, MODE SOMBRE)
+// 9. ANIMATIONS & NOTIFICATIONS
 // ==========================================
-document.addEventListener('click', (e) => {
-    if (e.target && e.target.classList.contains('add-btn')) {
-        const card = e.target.closest('.product-card, .pizza-card');
-        const cartIcon = document.querySelector('.cart-btn, .cart-icon, #btn-ouvrir-panier');
-
-        if (!card || !cartIcon || card.classList.contains('flying')) return;
-
-        const cardRect = card.getBoundingClientRect();
-        const cartRect = cartIcon.getBoundingClientRect();
-
-        const deltaX = (cartRect.left + cartRect.width / 2) - (cardRect.left + cardRect.width / 2);
-        const deltaY = (cartRect.top + cartRect.height / 2) - (cardRect.top + cardRect.height / 2);
-
-        card.style.setProperty('--translate-x', `${deltaX}px`);
-        card.style.setProperty('--translate-y', `${deltaY}px`);
-        card.classList.add('flying');
-
-        setTimeout(() => {
-            card.classList.remove('flying');
-            card.style.removeProperty('--translate-x');
-            card.style.removeProperty('--translate-y');
-        }, 600);
-    }
-});
-
 function afficherNotification(message) {
     const ancienneNotif = document.getElementById('notif-flash');
     if (ancienneNotif) ancienneNotif.remove();
@@ -488,7 +476,6 @@ function toggleDarkMode() {
 // 10. INITIALISATION AU DÉMARRAGE DU SITE
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-    // Mode sombre
     if (localStorage.getItem('pizzaTownTheme') === 'dark') {
         document.body.classList.add('dark-mode');
         const btn = document.getElementById('dark-btn');
@@ -522,7 +509,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Gestion de la modale Panier & Checkout
     const btnOuvrirPanier = document.getElementById('btn-ouvrir-panier');
     const btnFermerPanier = document.getElementById('btn-fermer-panier');
     const panneauPanier = document.getElementById('panneau-panier');
@@ -541,7 +527,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (btnFermerModal && modalCheckout) btnFermerModal.onclick = () => modalCheckout.classList.add('cache');
 
-    // SOUMISSION DE LA COMMANDE ET LANCEMENT DU TRACKER VRAI
     if (formCommande) {
         formCommande.onsubmit = async (e) => {
             e.preventDefault();
@@ -554,7 +539,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const totalCalculé = panier.reduce((acc, item) => acc + item.prix, 0);
 
-            // Vérifications règles
             if (modeCommandeActuel === 'livraison') {
                 if (!ville) { afficherNotification("⚠️ Veuillez choisir une ville."); return; }
                 if (!validerCommande(ville, totalCalculé)) return; 
@@ -589,7 +573,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (panneauPanier) panneauPanier.classList.add('cache');
                     formCommande.reset();
 
-                    // MAGIE : ON LANCE LE TRACKER QUI VA INTERROGER LA BDD
                     lancerTrackerDeCommande(commandeEnregistree._id);
                     
                 } else {
@@ -603,5 +586,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Lancement au démarrage
 chargerMenuDepuisAPI('tous');

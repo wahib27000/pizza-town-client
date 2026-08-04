@@ -128,7 +128,26 @@ function filtrerCategorie(categorie) {
 }
 
 // ==========================================
-// 4. GESTION DU PANIER & PROMOTIONS
+// 4. RECHERCHE EN DIRECT
+// ==========================================
+const inputRecherche = document.getElementById('input-recherche');
+if (inputRecherche) {
+    inputRecherche.addEventListener('input', (e) => {
+        const termeRecherche = e.target.value.toLowerCase().trim();
+        const cartesProduits = grillePizzas.children;
+        Array.from(cartesProduits).forEach(carte => {
+            const texteCarte = carte.innerText.toLowerCase();
+            if (texteCarte.includes(termeRecherche)) {
+                carte.style.display = "block";
+            } else {
+                carte.style.display = "none";  
+            }
+        });
+    });
+}
+
+// ==========================================
+// 5. GESTION DU PANIER & PROMOTIONS
 // ==========================================
 function ajouterAuPanier(idProduit, btnElement) {
     const produitTrouve = produits.find(p => p._id === idProduit);
@@ -182,7 +201,7 @@ function appliquerPromosAutomatiques(itemsPanier) {
         panierMaj.forEach(article => {
             if (article.nom.includes("(Senior)")) {
                 article.prix = 10.00;
-                article.promoappliquee = "Promo Mardi";
+                article.promoappliquee = "Promo Mardi : Senior à 10€";
             }
         });
     }
@@ -202,7 +221,7 @@ function appliquerPromosAutomatiques(itemsPanier) {
             for (let i = 0; i < pairesCount; i++) {
                 const idxMoinsChere = pizzasEligibles[i].index;
                 panierMaj[idxMoinsChere].prix = panierMaj[idxMoinsChere].prixOriginal * 0.5;
-                panierMaj[idxMoinsChere].promoappliquee = "2ème à -50%";
+                panierMaj[idxMoinsChere].promoappliquee = "2ème pizza à -50%";
             }
         }
     }
@@ -232,7 +251,7 @@ function mettreAJourPanier() {
     
     panierTraite.forEach((article, index) => {
         total += article.prix;
-        panier[index].prix = article.prix; // MAJ du vrai panier avec la promo
+        panier[index].prix = article.prix; 
         const ligne = document.createElement('div');
         ligne.classList.add('panier-item');
         
@@ -261,7 +280,7 @@ function retirerDuPanier(index) {
 }
 
 // ==========================================
-// 5. REGLES DE LIVRAISON (ANCIEN CODE)
+// 6. RÈGLES DE LIVRAISON
 // ==========================================
 const zonesLivraison = {
     "Incarville": 10, "La haye-le-comte": 10, "Louviers": 10, "Pinterville": 10,
@@ -276,7 +295,7 @@ const zonesLivraison = {
 
 function validerCommande(villeChoisie, totalPanier) {
     if (!zonesLivraison.hasOwnProperty(villeChoisie)) {
-        afficherNotification(`❌ Désolé, nous ne livrons pas à ${villeChoisie}.`);
+        afficherNotification(`❌ Désolé, nous ne livrons pas à ${villeChoisie} (limite 15km autour de Louviers).`);
         return false;
     }
     let minRequis = zonesLivraison[villeChoisie];
@@ -288,8 +307,93 @@ function validerCommande(villeChoisie, totalPanier) {
 }
 
 // ==========================================
-// 6. UI & ANIMATIONS (ANCIEN CODE)
+// 7. PIZZA BUILDER & UPSELLING
 // ==========================================
+function ouvrirPizzaBuilder() {
+    const modal = document.getElementById('modal-builder');
+    if (modal) modal.classList.remove('cache');
+}
+function fermerPizzaBuilder() {
+    const modal = document.getElementById('modal-builder');
+    if (modal) modal.classList.add('cache');
+}
+function ajouterPizzaCustomAuPanier(e) {
+    e.preventDefault();
+    const base = document.getElementById('builder-base') ? document.getElementById('builder-base').value : 'Tomate';
+    const checkboxes = document.querySelectorAll('input[name="ingredient"]:checked');
+    let ingredientsListe = [];
+    checkboxes.forEach(cb => ingredientsListe.push(cb.value));
+
+    const nomCustom = `Pizza Custom (${base} + ${ingredientsListe.length ? ingredientsListe.join(', ') : 'Rien'})`;
+    const prixCustom = 11.90 + (ingredientsListe.length * 1.50);
+
+    panier.push({ nom: nomCustom, prix: prixCustom, prixOriginal: prixCustom });
+    mettreAJourPanier();
+    fermerPizzaBuilder();
+    afficherNotification("✓ Votre pizza sur-mesure a été ajoutée !");
+}
+function ajouterUpselling(nomProduit, prixProduit) {
+    panier.push({ nom: nomProduit + " (Offre Flash)", prix: prixProduit, prixOriginal: prixProduit });
+    mettreAJourPanier();
+    afficherNotification(`✓ ${nomProduit} ajouté à prix réduit !`);
+    const box = document.getElementById('upselling-box');
+    if (box) box.style.display = 'none';
+}
+
+// ==========================================
+// 8. TRACKER DE COMMANDE (REMPLACE LA PAGE MOCHE)
+// ==========================================
+function lancerTrackerDeCommande() {
+    const modal = document.getElementById('modal-tracker');
+    if (modal) {
+        modal.classList.remove('cache');
+        setTimeout(() => {
+            document.getElementById('step-2').style.color = "var(--success)";
+            document.getElementById('step-2').innerHTML = "&#10004; En cours de préparation";
+        }, 3000);
+        setTimeout(() => {
+            document.getElementById('step-3').style.color = "var(--success)";
+            document.getElementById('step-3').innerHTML = "&#10004; Au four";
+        }, 7000);
+        setTimeout(() => {
+            document.getElementById('step-4').style.color = "var(--success)";
+            document.getElementById('step-4').innerHTML = "&#10004; Prête !";
+        }, 12000);
+    }
+}
+function fermerTracker() {
+    const modal = document.getElementById('modal-tracker');
+    if (modal) modal.classList.add('cache');
+}
+
+// ==========================================
+// 9. ANIMATIONS (VOL PANIER, NOTIFICATIONS, MODE SOMBRE)
+// ==========================================
+document.addEventListener('click', (e) => {
+    if (e.target && e.target.classList.contains('add-btn')) {
+        const card = e.target.closest('.product-card, .pizza-card');
+        const cartIcon = document.querySelector('.cart-btn, .cart-icon, #btn-ouvrir-panier');
+
+        if (!card || !cartIcon || card.classList.contains('flying')) return;
+
+        const cardRect = card.getBoundingClientRect();
+        const cartRect = cartIcon.getBoundingClientRect();
+
+        const deltaX = (cartRect.left + cartRect.width / 2) - (cardRect.left + cardRect.width / 2);
+        const deltaY = (cartRect.top + cartRect.height / 2) - (cardRect.top + cardRect.height / 2);
+
+        card.style.setProperty('--translate-x', `${deltaX}px`);
+        card.style.setProperty('--translate-y', `${deltaY}px`);
+        card.classList.add('flying');
+
+        setTimeout(() => {
+            card.classList.remove('flying');
+            card.style.removeProperty('--translate-x');
+            card.style.removeProperty('--translate-y');
+        }, 600);
+    }
+});
+
 function afficherNotification(message) {
     const ancienneNotif = document.getElementById('notif-flash');
     if (ancienneNotif) ancienneNotif.remove();
@@ -344,7 +448,7 @@ function toggleDarkMode() {
 }
 
 // ==========================================
-// 7. INITIALISATION ET SOUMISSION AU BACKEND
+// 10. INITIALISATION AU DÉMARRAGE DU SITE
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
     // Mode sombre
@@ -354,7 +458,34 @@ document.addEventListener('DOMContentLoaded', () => {
         if(btn) btn.innerHTML = "☀️ Mode Jour";
     }
 
-    // Gestion de la modale
+    // Carrousel Promotions
+    const slides = document.querySelectorAll(".carousel-slide");
+    const dots = document.querySelectorAll(".dot");
+    if (slides.length > 0) {
+        let currentIndex = 0;
+        let slideInterval;
+        function goToSlide(index) {
+            slides.forEach(slide => slide.classList.remove("active"));
+            dots.forEach(dot => dot.classList.remove("active"));
+            currentIndex = index;
+            slides[currentIndex].classList.add("active");
+            if (dots[currentIndex]) dots[currentIndex].classList.add("active");
+        }
+        function nextSlide() {
+            let nextIndex = (currentIndex + 1) % slides.length;
+            goToSlide(nextIndex);
+        }
+        slideInterval = setInterval(nextSlide, 4000);
+        dots.forEach((dot, index) => {
+            dot.addEventListener("click", () => {
+                clearInterval(slideInterval);
+                goToSlide(index);
+                slideInterval = setInterval(nextSlide, 4000);
+            });
+        });
+    }
+
+    // Gestion de la modale Panier & Checkout
     const btnOuvrirPanier = document.getElementById('btn-ouvrir-panier');
     const btnFermerPanier = document.getElementById('btn-fermer-panier');
     const panneauPanier = document.getElementById('panneau-panier');
@@ -373,7 +504,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (btnFermerModal && modalCheckout) btnFermerModal.onclick = () => modalCheckout.classList.add('cache');
 
-    // SOUMISSION AVEC VÉRIFICATION DES RÈGLES DE LIVRAISON (LA FUSION)
+    // SOUMISSION DE LA COMMANDE ET LANCEMENT DU TRACKER
     if (formCommande) {
         formCommande.onsubmit = async (e) => {
             e.preventDefault();
@@ -386,22 +517,13 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const totalCalculé = panier.reduce((acc, item) => acc + item.prix, 0);
 
-            // -- VÉRIFICATIONS STRICTES DE L'ANCIEN CODE --
+            // Vérifications
             if (modeCommandeActuel === 'livraison') {
-                if (!ville) {
-                    afficherNotification("⚠️ Veuillez choisir une ville de livraison.");
-                    return;
-                }
-                if (!validerCommande(ville, totalCalculé)) {
-                    return; // On bloque tout si le minimum n'est pas atteint !
-                }
+                if (!ville) { afficherNotification("⚠️ Veuillez choisir une ville."); return; }
+                if (!validerCommande(ville, totalCalculé)) return; 
             } else {
-                if (!heureRetrait) {
-                    afficherNotification("⚠️ Veuillez indiquer une heure de retrait.");
-                    return;
-                }
+                if (!heureRetrait) { afficherNotification("⚠️ Veuillez indiquer une heure de retrait."); return; }
             }
-            // -- FIN DES VÉRIFICATIONS --
 
             const nouvelleCommande = {
                 items: panier,
@@ -428,8 +550,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     mettreAJourPanier();
                     if (modalCheckout) modalCheckout.classList.add('cache');
                     if (panneauPanier) panneauPanier.classList.add('cache');
+                    formCommande.reset();
+
+                    // C'EST LÀ QUE LA MAGIE OPÈRE : ON LANCE LE TRACKER AU LIEU DE LA PAGE MOCHE
+                    lancerTrackerDeCommande();
                     
-                    window.location.href = 'confirmation.html';
                 } else {
                     afficherNotification("❌ Erreur lors de la validation.");
                 }

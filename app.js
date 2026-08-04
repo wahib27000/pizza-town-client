@@ -370,11 +370,13 @@ function mettreAJourVisuelTracker(statutAdmin) {
     if (!statutAdmin) return;
     const statut = statutAdmin.toLowerCase();
 
-    if (statut.includes('préparation') || statut.includes('preparation')) {
+    // 1. Si l'admin clique sur "En préparation" ou "En cours"
+    if (statut.includes('préparation') || statut.includes('preparation') || statut.includes('cours')) {
         document.getElementById('step-2').style.color = "var(--success)";
         document.getElementById('step-2').innerHTML = "&#10004; En cours de préparation";
     }
     
+    // 2. Si l'admin clique sur "Au four"
     if (statut.includes('four')) {
         document.getElementById('step-2').style.color = "var(--success)";
         document.getElementById('step-2').innerHTML = "&#10004; En cours de préparation";
@@ -382,7 +384,8 @@ function mettreAJourVisuelTracker(statutAdmin) {
         document.getElementById('step-3').innerHTML = "&#10004; Au four";
     }
     
-    if (statut.includes('prêt') || statut.includes('prete') || statut.includes('prête') || statut.includes('terminé') || statut.includes('livré')) {
+    // 3. Si l'admin clique sur "Prête" ou "Livrée"
+    if (statut.includes('prêt') || statut.includes('prete') || statut.includes('prête') || statut.includes('livré') || statut.includes('livree')) {
         document.getElementById('step-2').style.color = "var(--success)";
         document.getElementById('step-2').innerHTML = "&#10004; En cours de préparation";
         document.getElementById('step-3').style.color = "var(--success)";

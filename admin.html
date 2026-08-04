@@ -260,7 +260,7 @@
                 } else {
                     tbodyCommandes.innerHTML = enCours.map(cmd => {
                         const dateFormatee = formaterDate(cmd.createdAt);
-                        const articlesHtml = cmd.items ? cmd.items.map(art => `${art.quantity}x ${art.name}`).join('<br>') : '';
+                        const articlesHtml = cmd.items ? cmd.items.map(art => `${art.quantity || 1}x ${art.name}`).join('<br>') : '';
                         return `
                             <tr>
                                 <td>${dateFormatee}</td>
@@ -269,9 +269,12 @@
                                 <td>${cmd.total || 0} €</td>
                                 <td><span class="badge badge-attente">${cmd.status || 'En attente'}</span></td>
                                 <td>
-                                    <select onchange="changerStatut('${cmd._id}', this.value)" style="background: var(--dark); color: white;">
+                                    <!-- C'EST ICI QU'ON A CORRIGÉ LE VOCABULAIRE -->
+                                    <select onchange="changerStatut('${cmd._id}', this.value)" style="background: var(--dark); color: white; padding: 5px; border-radius: 4px;">
                                         <option value="En attente" ${cmd.status === 'En attente' ? 'selected' : ''}>En attente</option>
-                                        <option value="En cours" ${cmd.status === 'En cours' ? 'selected' : ''}>En cours</option>
+                                        <option value="En préparation" ${cmd.status === 'En préparation' ? 'selected' : ''}>En préparation</option>
+                                        <option value="Au four" ${cmd.status === 'Au four' ? 'selected' : ''}>Au four</option>
+                                        <option value="Prête" ${cmd.status === 'Prête' ? 'selected' : ''}>Prête !</option>
                                         <option value="Livrée" ${cmd.status === 'Livrée' ? 'selected' : ''}>Livrée</option>
                                     </select>
                                 </td>

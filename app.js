@@ -341,29 +341,63 @@ function ajouterUpselling(nomProduit, prixProduit) {
 }
 
 // ==========================================
-// 8. TRACKER DE COMMANDE (REMPLACE LA PAGE MOCHE)
+// 8. TRACKER DE COMMANDE EN TEMPS RÉEL (ADMIN)
 // ==========================================
-function lancerTrackerDeCommande() {
+let intervalSuivi = null;
+
+function lancerTrackerDeCommande(idCommande) {
     const modal = document.getElementById('modal-tracker');
-    if (modal) {
-        modal.classList.remove('cache');
-        setTimeout(() => {
-            document.getElementById('step-2').style.color = "var(--success)";
-            document.getElementById('step-2').innerHTML = "&#10004; En cours de préparation";
-        }, 3000);
-        setTimeout(() => {
-            document.getElementById('step-3').style.color = "var(--success)";
-            document.getElementById('step-3').innerHTML = "&#10004; Au four";
-        }, 7000);
-        setTimeout(() => {
-            document.getElementById('step-4').style.color = "var(--success)";
-            document.getElementById('step-4').innerHTML = "&#10004; Prête !";
-        }, 12000);
+    if (!modal) return;
+    
+    // 1. On affiche la modale
+    modal.classList.remove('cache');
+    
+    // 2. On lance une requête vers le backend toutes les 5 secondes
+    intervalSuivi = setInterval(async () => {
+        try {
+            const res = await fetch(`${API_URL}/api/orders/${idCommande}`);
+            if (res.ok) {
+                const commandeAdmin = await res.json();
+                mettreAJourVisuelTracker(commandeAdmin.status || commandeAdmin.etat); 
+            }
+        } catch (err) {
+            console.error("Erreur de synchronisation du tracker :", err);
+        }
+    }, 5000); 
+}
+
+function mettreAJourVisuelTracker(statutAdmin) {
+    if (!statutAdmin) return;
+    const statut = statutAdmin.toLowerCase();
+
+    if (statut.includes('préparation') || statut.includes('preparation')) {
+        document.getElementById('step-2').style.color = "var(--success)";
+        document.getElementById('step-2').innerHTML = "&#10004; En cours de préparation";
+    }
+    
+    if (statut.includes('four')) {
+        document.getElementById('step-2').style.color = "var(--success)";
+        document.getElementById('step-2').innerHTML = "&#10004; En cours de préparation";
+        document.getElementById('step-3').style.color = "var(--success)";
+        document.getElementById('step-3').innerHTML = "&#10004; Au four";
+    }
+    
+    if (statut.includes('prêt') || statut.includes('prete') || statut.includes('prête') || statut.includes('terminé') || statut.includes('livré')) {
+        document.getElementById('step-2').style.color = "var(--success)";
+        document.getElementById('step-2').innerHTML = "&#10004; En cours de préparation";
+        document.getElementById('step-3').style.color = "var(--success)";
+        document.getElementById('step-3').innerHTML = "&#10004; Au four";
+        document.getElementById('step-4').style.color = "var(--success)";
+        document.getElementById('step-4').innerHTML = "&#10004; Prête !";
+        
+        if (intervalSuivi) clearInterval(intervalSuivi);
     }
 }
+
 function fermerTracker() {
     const modal = document.getElementById('modal-tracker');
     if (modal) modal.classList.add('cache');
+    if (intervalSuivi) clearInterval(intervalSuivi); 
 }
 
 // ==========================================
@@ -504,7 +538,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (btnFermerModal && modalCheckout) btnFermerModal.onclick = () => modalCheckout.classList.add('cache');
 
-    // SOUMISSION DE LA COMMANDE ET LANCEMENT DU TRACKER
+    // SOUMISSION DE LA COMMANDE ET LANCEMENT DU TRACKER VRAI
     if (formCommande) {
         formCommande.onsubmit = async (e) => {
             e.preventDefault();
@@ -517,7 +551,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const totalCalculé = panier.reduce((acc, item) => acc + item.prix, 0);
 
-            // Vérifications
+            // Vérifications règles
             if (modeCommandeActuel === 'livraison') {
                 if (!ville) { afficherNotification("⚠️ Veuillez choisir une ville."); return; }
                 if (!validerCommande(ville, totalCalculé)) return; 
@@ -552,8 +586,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (panneauPanier) panneauPanier.classList.add('cache');
                     formCommande.reset();
 
-                    // C'EST LÀ QUE LA MAGIE OPÈRE : ON LANCE LE TRACKER AU LIEU DE LA PAGE MOCHE
-                    lancerTrackerDeCommande();
+                    // MAGIE : ON LANCE LE TRACKER QUI VA INTERROGER LA BDD
+                    lancerTrackerDeCommande(commandeEnregistree._id);
                     
                 } else {
                     afficherNotification("❌ Erreur lors de la validation.");

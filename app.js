@@ -5,6 +5,7 @@ const API_URL = "https://pizza-town-backend-1.onrender.com";
 let modeCommandeActuel = 'livraison';
 let panier = [];
 let produits = [];
+let codePromoApplique = null; // Stocke la réduction active
 
 // Chargement du panier sauvegardé
 const panierSauvegarde = localStorage.getItem('panierPizzaTown');
@@ -34,7 +35,6 @@ function afficherMenu(categorieFiltre = 'tous') {
     if (!grillePizzas) return;
     grillePizzas.innerHTML = "";
     
-    // --- NOUVEAUTÉ : On filtre pour cacher les produits en rupture de stock (Kill-Switch) ---
     const produitsFiltres = produits.filter(p => 
         p.disponible !== false && 
         (categorieFiltre === 'tous' || p.categorie === categorieFiltre)
@@ -149,7 +149,7 @@ if (inputRecherche) {
 }
 
 // ==========================================
-// 5. GESTION DU PANIER & PROMOTIONS (AVEC ANIMATIONS)
+// 5. GESTION DU PANIER & PROMOTIONS
 // ==========================================
 function ajouterAuPanier(idProduit, btnElement) {
     const produitTrouve = produits.find(p => p._id === idProduit);
@@ -177,10 +177,9 @@ function ajouterAuPanier(idProduit, btnElement) {
         prixFinal = produitTrouve.prixFixe || produitTrouve.prixBase || 0;
     }
 
-    panier.push({ nom: nomFinal, prix: prixFinal, prixOriginal: prixFinal });
+    panier.push({ nom: nomFinal, prix: prixFinal, prixOriginal: prixFinal, options: [] });
     mettreAJourPanier();
 
-    // --- ANIMATION 4 : BOUTON SUCCÈS ---
     const texteOriginal = btnElement.innerHTML;
     btnElement.classList.add('success');
     btnElement.innerHTML = "✓ Ajouté !";
@@ -190,7 +189,6 @@ function ajouterAuPanier(idProduit, btnElement) {
         btnElement.innerHTML = texteOriginal;
     }, 1000);
 
-    // --- ANIMATION 2 : REBOND ÉLASTIQUE DU PANIER ---
     const boutonPanierFlottant = document.getElementById('btn-ouvrir-panier');
     if (boutonPanierFlottant) {
         boutonPanierFlottant.classList.add('panier-pulse');
@@ -207,7 +205,7 @@ function appliquerPromosAutomatiques(itemsPanier) {
     const currentMinutes = now.getMinutes();
     
     const timeInMinutes = currentHour * 60 + currentMinutes;
-    const isEvening = timeInMinutes >= 1080 && timeInMinutes <= 1380; // 18h - 23h
+    const isEvening = timeInMinutes >= 1080 && timeInMinutes <= 1380;
     const isTakeaway = (modeCommandeActuel === 'emporter');
     const isTuesdayEvening = (dayOfWeek === 2) && isEvening;
     const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5;
@@ -248,6 +246,37 @@ function appliquerPromosAutomatiques(itemsPanier) {
     return panierMaj;
 }
 
+// Fonction pour vérifier le code promo saisi dans le panier via l'API Admin
+async function verifierCodePromo() {
+    const inputCode = document.getElementById('input-code-promo');
+    if (!inputCode) return;
+    const codeSaisi = inputCode.value.trim().toUpperCase();
+
+    if (!codeSaisi) {
+        afficherNotification("⚠️ Veuillez entrer un code promo.");
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API_URL}/api/promos`);
+        const promos = await res.json();
+        const promoTrouvee = promos.find(p => p.code.toUpperCase() === codeSaisi);
+
+        if (promoTrouvee) {
+            codePromoApplique = promoTrouvee;
+            afficherNotification(`🎟️ Code promo "${promoTrouvee.code}" appliqué (-${promoTrouvee.valeur}€) !`);
+            mettreAJourPanier();
+        } else {
+            afficherNotification("❌ Code promo invalide ou expiré.");
+            codePromoApplique = null;
+            mettreAJourPanier();
+        }
+    } catch (err) {
+        console.error("Erreur promo :", err);
+        afficherNotification("❌ Erreur lors de la vérification du code.");
+    }
+}
+
 function mettreAJourPanier() {
     let panierTraite = appliquerPromosAutomatiques(panier);
     const compteur = document.getElementById('compteur-panier');
@@ -265,6 +294,7 @@ function mettreAJourPanier() {
         if (prixTotalEl) prixTotalEl.innerText = "0.00 €";
         const btnPayerEl = document.getElementById('btn-payer');
         if (btnPayerEl) btnPayerEl.innerText = "Commander";
+        codePromoApplique = null;
         localStorage.removeItem('panierPizzaTown');
         return;
     }
@@ -276,16 +306,27 @@ function mettreAJourPanier() {
         ligne.classList.add('panier-item');
         
         let badgePromoHTML = article.promoappliquee ? `<br><span style="font-size: 0.7rem; background: #2a9d8f; color: white; padding: 2px 6px; border-radius: 4px;">${article.promoappliquee}</span>` : '';
+        let optionsHtml = (article.options && article.options.length > 0) ? `<br><span style="font-size: 0.75rem; color: #e0a96d;">↳ ${article.options.join(', ')}</span>` : '';
 
         ligne.innerHTML = `
             <div class="panier-item-infos">
-                <span class="panier-item-nom">${article.nom} ${badgePromoHTML}</span>
+                <span class="panier-item-nom">${article.nom} ${badgePromoHTML} ${optionsHtml}</span>
                 <span class="panier-item-prix">${article.prix.toFixed(2)} €</span>
             </div>
             <button class="panier-btn-supprimer" onclick="retirerDuPanier(${index})" title="Supprimer">✕</button>
         `;
         listeArticles.appendChild(ligne);
     });
+
+    // Application du code promo admin si valide
+    if (codePromoApplique) {
+        total -= codePromoApplique.valeur;
+        if (total < 0) total = 0;
+        const lignePromo = document.createElement('div');
+        lignePromo.style.cssText = "font-size: 0.85rem; color: #2a9d8f; margin: 10px 0; font-weight: bold; text-align: center;";
+        lignePromo.innerText = `🎟️ Remise promo (${codePromoApplique.code}) : -${codePromoApplique.valeur.toFixed(2)} €`;
+        listeArticles.appendChild(lignePromo);
+    }
     
     const prixTotalEl = document.getElementById('prix-total');
     if (prixTotalEl) prixTotalEl.innerText = total.toFixed(2) + " €";
@@ -327,7 +368,7 @@ function validerCommande(villeChoisie, totalPanier) {
 }
 
 // ==========================================
-// 7. PIZZA BUILDER & UPSELLING
+// 7. PIZZA BUILDER & UPSELLING (CORRIGÉ)
 // ==========================================
 function ouvrirPizzaBuilder() {
     const modal = document.getElementById('modal-builder');
@@ -337,23 +378,26 @@ function fermerPizzaBuilder() {
     const modal = document.getElementById('modal-builder');
     if (modal) modal.classList.add('cache');
 }
-function ajouterPizzaCustomAuPanier(e) {
+
+// CORRECTION DU NOM DE LA FONCTION POUR CORRESPONDRE À INDEX.HTML
+function ajouterPizzaCustom(e) {
     e.preventDefault();
     const base = document.getElementById('builder-base') ? document.getElementById('builder-base').value : 'Tomate';
     const checkboxes = document.querySelectorAll('input[name="ingredient"]:checked');
     let ingredientsListe = [];
     checkboxes.forEach(cb => ingredientsListe.push(cb.value));
 
-    const nomCustom = `Pizza Custom (${base} + ${ingredientsListe.length ? ingredientsListe.join(', ') : 'Rien'})`;
+    const nomCustom = `Pizza Custom (${base})`;
     const prixCustom = 11.90 + (ingredientsListe.length * 1.50);
 
-    panier.push({ nom: nomCustom, prix: prixCustom, prixOriginal: prixCustom });
+    panier.push({ nom: nomCustom, prix: prixCustom, prixOriginal: prixCustom, options: ingredientsListe });
     mettreAJourPanier();
     fermerPizzaBuilder();
     afficherNotification("✓ Votre pizza sur-mesure a été ajoutée !");
 }
+
 function ajouterUpselling(nomProduit, prixProduit) {
-    panier.push({ nom: nomProduit + " (Offre Flash)", prix: prixProduit, prixOriginal: prixProduit });
+    panier.push({ nom: nomProduit + " (Offre Flash)", prix: prixProduit, prixOriginal: prixProduit, options: [] });
     mettreAJourPanier();
     afficherNotification(`✓ ${nomProduit} ajouté à prix réduit !`);
     const box = document.getElementById('upselling-box');
@@ -361,7 +405,7 @@ function ajouterUpselling(nomProduit, prixProduit) {
 }
 
 // ==========================================
-// 8. TRACKER DE COMMANDE EN TEMPS RÉEL (ADMIN)
+// 8. TRACKER DE COMMANDE EN TEMPS RÉEL
 // ==========================================
 let intervalSuivi = null;
 
@@ -484,7 +528,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if(btn) btn.innerHTML = "☀️ Mode Jour";
     }
 
-    // Carrousel Promotions
     const slides = document.querySelectorAll(".carousel-slide");
     const dots = document.querySelectorAll(".dot");
     if (slides.length > 0) {
@@ -539,7 +582,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const ville = selectVille ? selectVille.value : '';
             const heureRetrait = document.getElementById('heure-retrait') ? document.getElementById('heure-retrait').value : '';
             
-            const totalCalculé = panier.reduce((acc, item) => acc + item.prix, 0);
+            let totalCalculé = panier.reduce((acc, item) => acc + item.prix, 0);
+            if (codePromoApplique) {
+                totalCalculé -= codePromoApplique.valeur;
+                if (totalCalculé < 0) totalCalculé = 0;
+            }
 
             if (modeCommandeActuel === 'livraison') {
                 if (!ville) { afficherNotification("⚠️ Veuillez choisir une ville."); return; }
@@ -570,6 +617,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     localStorage.setItem('derniereCommande', JSON.stringify(commandeEnregistree));
                     
                     panier = [];
+                    codePromoApplique = null;
                     mettreAJourPanier();
                     if (modalCheckout) modalCheckout.classList.add('cache');
                     if (panneauPanier) panneauPanier.classList.add('cache');

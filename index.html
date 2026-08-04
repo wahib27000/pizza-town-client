@@ -23,7 +23,6 @@
     <!-- BANDEAU DÉFILANT INFINI (MARQUEE) -->
     <div class="marquee-container">
         <div class="marquee-content">
-            <!-- On double le texte pour que la boucle soit invisible -->
             <span>🔥 Pâte fraîche maison • 🛵 Livraison rapide Louviers et alentours • 🍅 Produits frais 100% Locaux • </span>
             <span>🔥 Pâte fraîche maison • 🛵 Livraison rapide Louviers et alentours • 🍅 Produits frais 100% Locaux • </span>
         </div>
@@ -32,20 +31,17 @@
     <!-- CARROUSEL -->
     <div class="promo-carousel">
         <div class="carousel-track">
-            <!-- Slide 1 -->
             <div class="carousel-slide active">
                 <div class="promo-badge">Mardi Fous</div>
                 <h3>Les mardis FOUS !!!</h3>
                 <p>Toutes les séniors à emporter pour <strong>10€</strong> (soir uniquement) !</p>
             </div>
-            <!-- Slide 2 -->
             <div class="carousel-slide">
                 <div class="promo-badge">Offre Spéciale</div>
                 <h3>Une pizza achetée, la 2ème à -50% !</h3>
                 <p>Hors week-end sur Sénior et Méga à emporter uniquement !</p>
             </div>
         </div>
-        <!-- Indicateurs (les petits points) -->
         <div class="carousel-dots">
             <span class="dot active" data-slide="0"></span>
             <span class="dot" data-slide="1"></span>
@@ -64,7 +60,6 @@
         <button class="cat-btn" onclick="filtrerCategorie('menus')">Menus & formules</button>
         <button class="cat-btn" onclick="filtrerCategorie('panuozzo')">Panuozzo</button>
         
-        <!-- Bouton Pizza Builder -->
         <button class="cat-btn" onclick="ouvrirPizzaBuilder()" style="background: #E63946; color: white; font-weight: bold; border: none;">🛠️ Composer sa Pizza</button>
     </nav>
 
@@ -81,6 +76,12 @@
         </div>
         <div id="liste-articles-panier"></div>
         
+        <!-- Bloc Code Promo (Connecté à l'Admin) -->
+        <div style="padding: 0 15px; margin-bottom: 10px; display: flex; gap: 5px;">
+            <input type="text" id="input-code-promo" placeholder="Code promo..." style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; text-transform: uppercase; font-size: 0.9rem;">
+            <button type="button" onclick="verifierCodePromo()" style="background: #333; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 0.9rem; font-weight: bold;">Appliquer</button>
+        </div>
+
         <!-- Bloc Upselling au panier -->
         <div id="upselling-box" style="background: rgba(230, 57, 70, 0.1); border: 1px dashed #E63946; padding: 12px; border-radius: 8px; margin: 15px; text-align: center;">
             <p style="font-size: 0.85rem; margin-bottom: 8px; font-weight: bold; color: inherit;">🔥 Offre Flash : Ajoutez un Coca-Cola 33cl pour 1.00€ !</p>
@@ -104,13 +105,11 @@
                 <button id="btn-fermer-modal" class="close-btn">✕</button>
             </div>
             
-            <!-- Choix du mode de commande -->
             <div class="mode-commande-container" style="display: flex; gap: 10px; margin-bottom: 20px;">
                 <button type="button" id="btn-mode-livraison" class="mode-btn active-mode" onclick="changerModeCommande('livraison')" style="flex: 1; padding: 10px; border: 2px solid #E63946; background: #E63946; color: white; border-radius: 8px; font-weight: bold; cursor: pointer;">🚚 Livraison</button>
                 <button type="button" id="btn-mode-emporter" class="mode-btn" onclick="changerModeCommande('emporter')" style="flex: 1; padding: 10px; border: 2px solid #ccc; background: #f1f1f1; color: #333; border-radius: 8px; font-weight: bold; cursor: pointer;">🛍️ À emporter</button>
             </div>
 
-            <!-- Champ Ville (Livraison) -->
             <div id="champ-ville-wrapper" style="margin-bottom: 15px;">
                 <label for="ville-client" style="display: block; font-size: 0.9rem; margin-bottom: 5px; font-weight: bold;">Ville de livraison :</label>
                 <select id="ville-client" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc;">
@@ -138,7 +137,6 @@
                 </select>
             </div>
 
-            <!-- Champ heure de retrait (À emporter) -->
             <div id="champ-heure-wrapper" style="display: none; margin-bottom: 15px;">
                 <label for="heure-retrait" style="display: block; font-size: 0.9rem; margin-bottom: 5px; font-weight: bold;">Heure de retrait souhaitée :</label>
                 <input type="time" id="heure-retrait" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;">
@@ -179,7 +177,6 @@
             </div>
         </div>
 
-        <!-- Google Maps -->
         <div style="background: white; padding: 10px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; height: 300px;">
             <iframe width="100%" height="100%" style="border:0; border-radius: 8px;" loading="lazy" allowfullscreen src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d20998.50893325066!2d1.1500!3d49.2100!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e13e8d697b9739%3A0x40c14484fbdb580!2s27400%20Louviers!5e0!3m2!1sfr!2sfr!4v1650000000000!5m2!1sfr!2sfr"></iframe>
         </div>
@@ -219,22 +216,15 @@
         </div>
     </footer>
 
-    <!-- ========================================== -->
-    <!-- MODALES (BUILDER VISUEL & TRACKER)         -->
-    <!-- ========================================== -->
-
-    <!-- 1. MODALE PIZZA BUILDER (VISUEL EN DIRECT) -->
+    <!-- MODALES -->
     <div id="modal-builder" class="modal-overlay cache" style="position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display:flex; justify-content:center; align-items:center; z-index:2000;">
         <div style="background: white; color: #333; padding: 30px; border-radius: 12px; width: 90%; max-width: 550px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
             <h2 style="margin-top: 0; color: #111; text-align: center;">Crée ta Pizza</h2>
             
-            <!-- LE VISUEL DE LA PIZZA EN DIRECT -->
             <div class="pizza-visual-container">
                 <div id="visuel-pate" class="pizza-layer pate">
-                    <!-- Les calques de sauce -->
                     <div id="visuel-sauce-tomate" class="pizza-layer sauce tomate active"></div>
                     <div id="visuel-sauce-creme" class="pizza-layer sauce creme"></div>
-                    <!-- Les calques d'ingrédients -->
                     <div id="visuel-mozzarella" class="pizza-layer ingredient mozza"></div>
                     <div id="visuel-chevre" class="pizza-layer ingredient chevre"></div>
                     <div id="visuel-viande" class="pizza-layer ingredient viande"></div>
@@ -246,8 +236,8 @@
                 </div>
             </div>
 
+            <!-- CORRECTION : on appelle la fonction exacte "ajouterPizzaCustom" -->
             <form id="form-builder" onsubmit="ajouterPizzaCustom(event)">
-                
                 <div style="margin: 15px 0;">
                     <label style="font-weight: bold; display: block; margin-bottom: 5px;">1. Taille :</label>
                     <select id="builder-taille" onchange="calculerPrixBuilder()" style="width:100%; padding:10px; border-radius:6px; border: 1px solid #ccc; font-size: 1rem;">
@@ -303,7 +293,7 @@
         </div>
     </div>
 
-    <!-- 2. MODALE DU TRACKER DE COMMANDE -->
+    <!-- TRACKER -->
     <div id="modal-tracker" class="modal-overlay cache" style="position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:flex; justify-content:center; align-items:center; z-index:2000;">
         <div style="background: white; color: #333; padding: 30px; border-radius: 12px; width: 90%; max-width: 450px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
             <h2 style="margin-top: 0; color: #111;">🍕 Suivi de votre Commande</h2>

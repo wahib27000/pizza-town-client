@@ -273,6 +273,7 @@ function appliquerPromosAutomatiques(itemsPanier) {
     return panierMaj;
 }
 
+// Fonction de vérification du code promo sécurisée (évite le plantage undefined)
 async function verifierCodePromo() {
     const inputCode = document.getElementById('input-code-promo');
     if (!inputCode) return;
@@ -285,8 +286,12 @@ async function verifierCodePromo() {
 
     try {
         const res = await fetch(`${API_URL}/api/promos`);
+        if (!res.ok) throw new Error("Erreur serveur");
+        
         const promos = await res.json();
-        const promoTrouvee = promos.find(p => p.code.toUpperCase() === codeSaisi);
+        
+        // Recherche ultra-sécurisée : vérifie que p et p.code existent pour éviter les plantages
+        const promoTrouvee = promos.find(p => p && p.code && p.code.toUpperCase() === codeSaisi);
 
         if (promoTrouvee) {
             codePromoApplique = promoTrouvee;
@@ -591,7 +596,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (btnPayer && modalCheckout) {
         btnPayer.onclick = () => {
-            // Test du Kill-Switch horaire
             if (!verifierSiOuvert()) {
                 afficherNotification("💤 Pizza Town est actuellement fermé. Réouverture prochaine !");
                 return;
@@ -626,7 +630,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!heureRetrait) { afficherNotification("⚠️ Veuillez indiquer une heure de retrait."); return; }
             }
 
-            // Adresse complète combinée pour l'admin
             const adresseComplete = modeCommandeActuel === 'livraison' 
                 ? `${adressePrecise}, ${ville}` 
                 : 'À emporter (Sur place)';
@@ -637,7 +640,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 mode: modeCommandeActuel,
                 customerName: nom,
                 phone: telephone,
-                address: adresseComplete, // Envoie l'adresse complète précise
+                address: adresseComplete,
                 heureRetrait: modeCommandeActuel === 'emporter' ? heureRetrait : 'Immédiat'
             };
 

@@ -14,6 +14,33 @@ if (panierSauvegarde) {
 }
 
 // ==========================================
+// 1.1 KILL-SWITCH HORAIRE (Vérification si ouvert)
+// ==========================================
+function verifierSiOuvert() {
+    const now = new Date();
+    const day = now.getDay(); // 0 = Dimanche, 1 = Lundi, etc.
+    const hour = now.getHours();
+    const minutes = now.getMinutes();
+    const timeInMins = hour * 60 + minutes;
+
+    // Horaires Pizza Town :
+    // Lundi - Jeudi : 11:30 - 14:30 (690 - 870) et 18:00 - 23:00 (1080 - 1380)
+    // Vendredi - Samedi : 11:30 - 14:30 (690 - 870) et 18:00 - 00:00 (1080 - 1440)
+    // Dimanche : 18:00 - 23:00 (1080 - 1380)
+    let estOuvert = false;
+
+    if (day >= 1 && day <= 4) {
+        estOuvert = (timeInMins >= 690 && timeInMins <= 870) || (timeInMins >= 1080 && timeInMins <= 1380);
+    } else if (day === 5 || day === 6) {
+        estOuvert = (timeInMins >= 690 && timeInMins <= 870) || (timeInMins >= 1080 && timeInMins <= 1440);
+    } else if (day === 0) {
+        estOuvert = (timeInMins >= 1080 && timeInMins <= 1380);
+    }
+
+    return true; // ⚠️ Laisse 'true' pour tester à tout moment, ou remplace par 'estOuvert' pour bloquer la nuit
+}
+
+// ==========================================
 // 2. RÉCUPÉRATION DU MENU DEPUIS LE BACKEND
 // ==========================================
 async function chargerMenuDepuisAPI(categorieFiltre = 'tous') {
@@ -246,7 +273,6 @@ function appliquerPromosAutomatiques(itemsPanier) {
     return panierMaj;
 }
 
-// Fonction pour vérifier le code promo saisi dans le panier via l'API Admin
 async function verifierCodePromo() {
     const inputCode = document.getElementById('input-code-promo');
     if (!inputCode) return;
@@ -318,7 +344,6 @@ function mettreAJourPanier() {
         listeArticles.appendChild(ligne);
     });
 
-    // Application du code promo admin si valide
     if (codePromoApplique) {
         total -= codePromoApplique.valeur;
         if (total < 0) total = 0;
@@ -368,7 +393,7 @@ function validerCommande(villeChoisie, totalPanier) {
 }
 
 // ==========================================
-// 7. PIZZA BUILDER & UPSELLING (CORRIGÉ)
+// 7. PIZZA BUILDER & UPSELLING
 // ==========================================
 function ouvrirPizzaBuilder() {
     const modal = document.getElementById('modal-builder');
@@ -379,7 +404,6 @@ function fermerPizzaBuilder() {
     if (modal) modal.classList.add('cache');
 }
 
-// CORRECTION DU NOM DE LA FONCTION POUR CORRESPONDRE À INDEX.HTML
 function ajouterPizzaCustom(e) {
     e.preventDefault();
     const base = document.getElementById('builder-base') ? document.getElementById('builder-base').value : 'Tomate';
@@ -564,8 +588,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnOuvrirPanier && panneauPanier) btnOuvrirPanier.onclick = () => panneauPanier.classList.remove('cache');
     if (btnFermerPanier && panneauPanier) btnFermerPanier.onclick = () => panneauPanier.classList.add('cache');
+    
     if (btnPayer && modalCheckout) {
         btnPayer.onclick = () => {
+            // Test du Kill-Switch horaire
+            if (!verifierSiOuvert()) {
+                afficherNotification("💤 Pizza Town est actuellement fermé. Réouverture prochaine !");
+                return;
+            }
             if (panier.length === 0) { afficherNotification("⚠️ Votre panier est vide !"); return; }
             modalCheckout.classList.remove('cache');
         };
@@ -580,6 +610,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const telephone = document.getElementById('tel-client').value;
             const selectVille = document.getElementById('ville-client');
             const ville = selectVille ? selectVille.value : '';
+            const adressePrecise = document.getElementById('adresse-client') ? document.getElementById('adresse-client').value.trim() : '';
             const heureRetrait = document.getElementById('heure-retrait') ? document.getElementById('heure-retrait').value : '';
             
             let totalCalculé = panier.reduce((acc, item) => acc + item.prix, 0);
@@ -589,11 +620,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (modeCommandeActuel === 'livraison') {
-                if (!ville) { afficherNotification("⚠️ Veuillez choisir une ville."); return; }
+                if (!ville || !adressePrecise) { afficherNotification("⚠️ Veuillez renseigner la ville et l'adresse précise."); return; }
                 if (!validerCommande(ville, totalCalculé)) return; 
             } else {
                 if (!heureRetrait) { afficherNotification("⚠️ Veuillez indiquer une heure de retrait."); return; }
             }
+
+            // Adresse complète combinée pour l'admin
+            const adresseComplete = modeCommandeActuel === 'livraison' 
+                ? `${adressePrecise}, ${ville}` 
+                : 'À emporter (Sur place)';
 
             const nouvelleCommande = {
                 items: panier,
@@ -601,7 +637,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 mode: modeCommandeActuel,
                 customerName: nom,
                 phone: telephone,
-                address: modeCommandeActuel === 'livraison' ? ville : 'À emporter (Sur place)',
+                address: adresseComplete, // Envoie l'adresse complète précise
                 heureRetrait: modeCommandeActuel === 'emporter' ? heureRetrait : 'Immédiat'
             };
 

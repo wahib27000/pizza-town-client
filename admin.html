@@ -139,7 +139,6 @@
                 <div class="form-box">
                     <form id="form-ajout-produit">
                         <input type="text" id="prod-nom" placeholder="Nom du produit" required>
-                        <!-- CORRECTION : Les value correspondent exactement aux filtres du client (app.js) -->
                         <select id="prod-cat" required>
                             <option value="" disabled selected>Choisir une catégorie...</option>
                             <option value="pizzas">Pizzas Napolitaines</option>
@@ -328,7 +327,8 @@
                 }
 
                 let htmlStr = "<h4>" + (cmd.customerName || 'Inconnu') + " <span>" + (cmd.total || 0) + "€</span></h4>";
-                htmlStr += "<p style='font-size: 0.75rem; color:#888;'>" + new Date(cmd.createdAt).toLocaleTimeString('fr-FR') + " - " + (cmd.mode || '?') + "</p>";
+                htmlStr += "<p style='font-size: 0.75rem; color:#888;'>" + new Date(cmd.createdAt).toLocaleTimeString('fr-FR') + " - <b>" + (cmd.mode || '?').toUpperCase() + "</b></p>";
+                htmlStr += "<p style='font-size: 0.85rem; color:#2a9d8f; font-weight:bold; margin-top:4px;'>📍 " + (cmd.address || 'Aucune adresse') + "</p>";
                 htmlStr += "<div style='border-top:1px solid #333; margin:5px 0;'></div>";
                 htmlStr += "<p>" + articlesHtml + "</p>";
                 htmlStr += "<div style='display:flex; gap:5px; margin-top:5px;'>";
@@ -370,6 +370,7 @@
             html += "<h1>PIZZA TOWN</h1><div style='text-align:center; font-size:1.2rem; margin-top:5px;'>TICKET CUISINE</div><div class='divider'></div>";
             html += "<div style='font-size:1.2rem;'>Client : <b>" + (cmd.customerName || "Inconnu") + "</b></div>";
             html += "<div style='font-size:1.2rem;'>Tel : " + (cmd.phone || "-") + "</div>";
+            html += "<div style='font-size:1.2rem;'>Adresse : <br><b>" + (cmd.address || "-") + "</b></div>";
             html += "<div style='font-size:1.2rem;'>Heure : " + new Date(cmd.createdAt).toLocaleTimeString("fr-FR") + "</div>";
             html += "<div style='font-size:1.2rem; margin-top:10px;'>Type : <b>" + (cmd.mode || "").toUpperCase() + "</b></div><div class='divider'></div>";
             

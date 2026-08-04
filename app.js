@@ -1,15 +1,20 @@
-let modeCommandeActuel = 'livraison';
+// ==========================================
+// 1. CONFIGURATION & VARIABLES GLOBALES
+// ==========================================
 const API_URL = "https://pizza-town-backend-1.onrender.com";
-
+let modeCommandeActuel = 'livraison';
 let panier = [];
+let produits = [];
+
+// Chargement du panier sauvegardé
 const panierSauvegarde = localStorage.getItem('panierPizzaTown');
 if (panierSauvegarde) {
     panier = JSON.parse(panierSauvegarde);
 }
 
-let produits = [];
-
-// --- CHARGEMENT DU CATALOGUE DEPUIS MONGODB ---
+// ==========================================
+// 2. RÉCUPÉRATION DU MENU DEPUIS LE BACKEND
+// ==========================================
 async function chargerMenuDepuisAPI(categorieFiltre = 'tous') {
     try {
         const response = await fetch(`${API_URL}/api/products`);
@@ -20,6 +25,9 @@ async function chargerMenuDepuisAPI(categorieFiltre = 'tous') {
     }
 }
 
+// ==========================================
+// 3. AFFICHAGE ET GESTION DU MENU
+// ==========================================
 const grillePizzas = document.getElementById('grille-pizzas');
 
 function afficherMenu(categorieFiltre = 'tous') {
@@ -56,15 +64,15 @@ function afficherMenu(categorieFiltre = 'tous') {
         if (produit.categorie === 'pizzas' && produit.prixBase) {
             optionsTailleHTML = `
                 <div class="taille-selector" style="display: flex; gap: 5px; margin: 12px 0;">
-                    <label style="flex: 1; text-align: center; font-size: 0.75rem; font-weight: bold; padding: 6px 2px; background: #f1f1f1; border-radius: 6px; cursor: pointer;">
+                    <label style="flex: 1; text-align: center; font-size: 0.75rem; font-weight: bold; padding: 6px 2px; background: #f1f1f1; border-radius: 6px; cursor: pointer; transition: all 0.2s;">
                         <input type="radio" name="taille-${produit._id}" value="junior" style="display:none;" onchange="changerPrixPizza('${produit._id}', ${(produit.prixBase - 3.90).toFixed(2)}, this)">
                         Junior<br><span style="font-weight: normal; color: #666;">${(produit.prixBase - 3.90).toFixed(2)}€</span>
                     </label>
-                    <label style="flex: 1; text-align: center; font-size: 0.75rem; font-weight: bold; padding: 6px 2px; background: #E63946; color: white; border-radius: 6px; cursor: pointer;" class="taille-active">
+                    <label style="flex: 1; text-align: center; font-size: 0.75rem; font-weight: bold; padding: 6px 2px; background: #E63946; color: white; border-radius: 6px; cursor: pointer; transition: all 0.2s;" class="taille-active">
                         <input type="radio" name="taille-${produit._id}" value="senior" checked style="display:none;" onchange="changerPrixPizza('${produit._id}', ${produit.prixBase}, this)">
-                        Senior<br><span style="font-weight: normal; color: #ffe5e7;">${produit.prixBase}€</span>
+                        Senior<br><span style="font-weight: normal; color: #ffe5e7;">${produit.prixBase.toFixed(2)}€</span>
                     </label>
-                    <label style="flex: 1; text-align: center; font-size: 0.75rem; font-weight: bold; padding: 6px 2px; background: #f1f1f1; border-radius: 6px; cursor: pointer;">
+                    <label style="flex: 1; text-align: center; font-size: 0.75rem; font-weight: bold; padding: 6px 2px; background: #f1f1f1; border-radius: 6px; cursor: pointer; transition: all 0.2s;">
                         <input type="radio" name="taille-${produit._id}" value="mega" style="display:none;" onchange="changerPrixPizza('${produit._id}', ${(produit.prixBase + 6.00).toFixed(2)}, this)">
                         Méga<br><span style="font-weight: normal; color: #666;">${(produit.prixBase + 6.00).toFixed(2)}€</span>
                     </label>
@@ -98,8 +106,13 @@ function changerPrixPizza(idProduit, nouveauPrix, elementInput) {
     if (!conteneur) return;
     conteneur.querySelectorAll('label').forEach(label => {
         label.classList.remove('taille-active');
-        label.style.background = '#f1f1f1';
-        label.style.color = '#333';
+        if (!document.body.classList.contains('dark-mode')) {
+            label.style.background = '#f1f1f1';
+            label.style.color = '#333';
+        } else {
+            label.style.background = '#2d2d2d';
+            label.style.color = '#ccc';
+        }
     });
     
     const labelActif = elementInput.closest('label');
@@ -114,6 +127,9 @@ function filtrerCategorie(categorie) {
     afficherMenu(categorie);
 }
 
+// ==========================================
+// 4. GESTION DU PANIER & PROMOTIONS
+// ==========================================
 function ajouterAuPanier(idProduit, btnElement) {
     const produitTrouve = produits.find(p => p._id === idProduit);
     if (!produitTrouve) return;
@@ -140,17 +156,61 @@ function ajouterAuPanier(idProduit, btnElement) {
         prixFinal = produitTrouve.prixFixe || produitTrouve.prixBase || 0;
     }
 
-    panier.push({
-        nom: nomFinal,
-        prix: prixFinal,
-        prixOriginal: prixFinal 
-    });
-
+    panier.push({ nom: nomFinal, prix: prixFinal, prixOriginal: prixFinal });
     mettreAJourPanier();
     afficherNotification(`✓ ${nomFinal} ajouté au panier !`);
 }
 
+function appliquerPromosAutomatiques(itemsPanier) {
+    const now = new Date();
+    const dayOfWeek = now.getDay(); 
+    const currentHour = now.getHours();
+    const currentMinutes = now.getMinutes();
+    
+    const timeInMinutes = currentHour * 60 + currentMinutes;
+    const isEvening = timeInMinutes >= 1080 && timeInMinutes <= 1380; // 18h - 23h
+    const isTakeaway = (modeCommandeActuel === 'emporter');
+    const isTuesdayEvening = (dayOfWeek === 2) && isEvening;
+    const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5;
+
+    let panierMaj = itemsPanier.map(article => {
+        let prixOriginal = article.prixOriginal !== undefined ? article.prixOriginal : article.prix;
+        return { ...article, prixOriginal: prixOriginal, prix: prixOriginal, promoappliquee: null };
+    });
+
+    if (isTuesdayEvening && isTakeaway) {
+        panierMaj.forEach(article => {
+            if (article.nom.includes("(Senior)")) {
+                article.prix = 10.00;
+                article.promoappliquee = "Promo Mardi";
+            }
+        });
+    }
+
+    if (isWeekday && isTakeaway) {
+        let pizzasEligibles = [];
+        panierMaj.forEach((article, index) => {
+            if ((article.nom.includes("(Senior)") || article.nom.includes("(Méga)")) && !article.promoappliquee) {
+                pizzasEligibles.push({ index: index, prix: article.prixOriginal });
+            }
+        });
+
+        pizzasEligibles.sort((a, b) => a.prix - b.prix);
+
+        if (pizzasEligibles.length >= 2) {
+            const pairesCount = Math.floor(pizzasEligibles.length / 2);
+            for (let i = 0; i < pairesCount; i++) {
+                const idxMoinsChere = pizzasEligibles[i].index;
+                panierMaj[idxMoinsChere].prix = panierMaj[idxMoinsChere].prixOriginal * 0.5;
+                panierMaj[idxMoinsChere].promoappliquee = "2ème à -50%";
+            }
+        }
+    }
+    return panierMaj;
+}
+
 function mettreAJourPanier() {
+    let panierTraite = appliquerPromosAutomatiques(panier);
     const compteur = document.getElementById('compteur-panier');
     if (compteur) compteur.innerText = panier.length;
     
@@ -170,14 +230,17 @@ function mettreAJourPanier() {
         return;
     }
     
-    panier.forEach((article, index) => {
+    panierTraite.forEach((article, index) => {
         total += article.prix;
+        panier[index].prix = article.prix; // MAJ du vrai panier avec la promo
         const ligne = document.createElement('div');
         ligne.classList.add('panier-item');
         
+        let badgePromoHTML = article.promoappliquee ? `<br><span style="font-size: 0.7rem; background: #2a9d8f; color: white; padding: 2px 6px; border-radius: 4px;">${article.promoappliquee}</span>` : '';
+
         ligne.innerHTML = `
             <div class="panier-item-infos">
-                <span class="panier-item-nom">${article.nom}</span>
+                <span class="panier-item-nom">${article.nom} ${badgePromoHTML}</span>
                 <span class="panier-item-prix">${article.prix.toFixed(2)} €</span>
             </div>
             <button class="panier-btn-supprimer" onclick="retirerDuPanier(${index})" title="Supprimer">✕</button>
@@ -195,6 +258,56 @@ function mettreAJourPanier() {
 function retirerDuPanier(index) {
     panier.splice(index, 1);
     mettreAJourPanier();
+}
+
+// ==========================================
+// 5. REGLES DE LIVRAISON (ANCIEN CODE)
+// ==========================================
+const zonesLivraison = {
+    "Incarville": 10, "La haye-le-comte": 10, "Louviers": 10, "Pinterville": 10,
+    "Acquigny": 15, "Le vaudreuil": 15, "Saint-etienne-du-vauvray": 15, "Saint-pierre-du-vauvray": 15, "Val-de-reuil": 15, "Vironvay": 15,
+    "Heudebouville": 20, "La vallee": 20, "Lery": 20, "Montaure": 20, "Surville": 20, "Tostes": 20,
+    "Criquebeuf-sur-seine": 30, "Emalleville": 30, "Porte-joie": 30, "Sotteville-sous-le-val": 30, "Vieux-villez": 30,
+    "Amfreville-sur-iton": 30, "Cailly-sur-eure": 30, "Connelles": 30, "Crasville": 30,
+    "Fontaine-bellenger": 30, "Fontaine-heudebourg": 30, "Herqueville": 30,
+    "Heudreville-sur-eure": 30, "Houetteville": 30, "Igoville": 30, "La chapelle-du-bois-des-faulx": 30, "La haye-malherbe": 30, "Le manoir": 30, "Le mesnil-jourdain": 30, "Muids": 30, "Poses": 30, "Quatremare": 30, "Surtauville": 30, "Tournedos-sur-seine": 30, "Venables": 30, "Vraiville": 30,
+    "Ailly": 30, "Ande": 30, "Canappeville": 30
+};
+
+function validerCommande(villeChoisie, totalPanier) {
+    if (!zonesLivraison.hasOwnProperty(villeChoisie)) {
+        afficherNotification(`❌ Désolé, nous ne livrons pas à ${villeChoisie}.`);
+        return false;
+    }
+    let minRequis = zonesLivraison[villeChoisie];
+    if (totalPanier < minRequis) {
+        afficherNotification(`⚠️ Pour ${villeChoisie}, min. ${minRequis}€ (Il manque ${(minRequis - totalPanier).toFixed(2)}€ !).`);
+        return false;
+    }
+    return true;
+}
+
+// ==========================================
+// 6. UI & ANIMATIONS (ANCIEN CODE)
+// ==========================================
+function afficherNotification(message) {
+    const ancienneNotif = document.getElementById('notif-flash');
+    if (ancienneNotif) ancienneNotif.remove();
+    const notif = document.createElement('div');
+    notif.id = 'notif-flash';
+    notif.innerText = message;
+    notif.style.position = 'fixed';
+    notif.style.bottom = '20px';
+    notif.style.left = '20px';
+    notif.style.background = '#2a9d8f';
+    notif.style.color = 'white';
+    notif.style.padding = '12px 20px';
+    notif.style.borderRadius = '6px';
+    notif.style.fontWeight = 'bold';
+    notif.style.zIndex = '3000';
+    notif.style.boxShadow = '0 4px 10px rgba(0,0,0,0.2)';
+    document.body.appendChild(notif);
+    setTimeout(() => notif.remove(), 2500);
 }
 
 function changerModeCommande(mode) {
@@ -215,32 +328,33 @@ function changerModeCommande(mode) {
         if(champVille) champVille.style.display = 'none';
         if(champHeure) champHeure.style.display = 'block';
     }
+    mettreAJourPanier();
 }
 
-function afficherNotification(message) {
-    const ancienneNotif = document.getElementById('notif-flash');
-    if (ancienneNotif) ancienneNotif.remove();
-
-    const notif = document.createElement('div');
-    notif.id = 'notif-flash';
-    notif.innerText = message;
-    notif.style.position = 'fixed';
-    notif.style.bottom = '20px';
-    notif.style.left = '20px';
-    notif.style.background = '#2a9d8f';
-    notif.style.color = 'white';
-    notif.style.padding = '12px 20px';
-    notif.style.borderRadius = '6px';
-    notif.style.fontWeight = 'bold';
-    notif.style.zIndex = '3000';
-    notif.style.boxShadow = '0 4px 10px rgba(0,0,0,0.2)';
-    
-    document.body.appendChild(notif);
-    setTimeout(() => notif.remove(), 2500);
+function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    const btn = document.getElementById('dark-btn');
+    if (document.body.classList.contains('dark-mode')) {
+        if (btn) btn.innerHTML = "☀️ Mode Jour";
+        localStorage.setItem('pizzaTownTheme', 'dark');
+    } else {
+        if (btn) btn.innerHTML = "🌙 Mode Nuit";
+        localStorage.setItem('pizzaTownTheme', 'light');
+    }
 }
 
-// --- INITIALISATION DES ÉVÉNEMENTS GLOBAUX ---
+// ==========================================
+// 7. INITIALISATION ET SOUMISSION AU BACKEND
+// ==========================================
 document.addEventListener('DOMContentLoaded', () => {
+    // Mode sombre
+    if (localStorage.getItem('pizzaTownTheme') === 'dark') {
+        document.body.classList.add('dark-mode');
+        const btn = document.getElementById('dark-btn');
+        if(btn) btn.innerHTML = "☀️ Mode Jour";
+    }
+
+    // Gestion de la modale
     const btnOuvrirPanier = document.getElementById('btn-ouvrir-panier');
     const btnFermerPanier = document.getElementById('btn-fermer-panier');
     const panneauPanier = document.getElementById('panneau-panier');
@@ -249,39 +363,45 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnFermerModal = document.getElementById('btn-fermer-modal');
     const formCommande = document.getElementById('form-commande');
 
-    if (btnOuvrirPanier && panneauPanier) {
-        btnOuvrirPanier.onclick = () => panneauPanier.classList.remove('cache');
-    }
-
-    if (btnFermerPanier && panneauPanier) {
-        btnFermerPanier.onclick = () => panneauPanier.classList.add('cache');
-    }
-
+    if (btnOuvrirPanier && panneauPanier) btnOuvrirPanier.onclick = () => panneauPanier.classList.remove('cache');
+    if (btnFermerPanier && panneauPanier) btnFermerPanier.onclick = () => panneauPanier.classList.add('cache');
     if (btnPayer && modalCheckout) {
         btnPayer.onclick = () => {
-            if (panier.length === 0) {
-                alert("Votre panier est vide !");
-                return;
-            }
+            if (panier.length === 0) { afficherNotification("⚠️ Votre panier est vide !"); return; }
             modalCheckout.classList.remove('cache');
         };
     }
+    if (btnFermerModal && modalCheckout) btnFermerModal.onclick = () => modalCheckout.classList.add('cache');
 
-    if (btnFermerModal && modalCheckout) {
-        btnFermerModal.onclick = () => modalCheckout.classList.add('cache');
-    }
-
-    // SOUMISSION DE LA COMMANDE VERS MONGODB / RENDER
+    // SOUMISSION AVEC VÉRIFICATION DES RÈGLES DE LIVRAISON (LA FUSION)
     if (formCommande) {
         formCommande.onsubmit = async (e) => {
             e.preventDefault();
 
             const nom = document.getElementById('nom-client').value;
             const telephone = document.getElementById('tel-client').value;
-            const ville = document.getElementById('ville-client') ? document.getElementById('ville-client').value : '';
+            const selectVille = document.getElementById('ville-client');
+            const ville = selectVille ? selectVille.value : '';
             const heureRetrait = document.getElementById('heure-retrait') ? document.getElementById('heure-retrait').value : '';
-
+            
             const totalCalculé = panier.reduce((acc, item) => acc + item.prix, 0);
+
+            // -- VÉRIFICATIONS STRICTES DE L'ANCIEN CODE --
+            if (modeCommandeActuel === 'livraison') {
+                if (!ville) {
+                    afficherNotification("⚠️ Veuillez choisir une ville de livraison.");
+                    return;
+                }
+                if (!validerCommande(ville, totalCalculé)) {
+                    return; // On bloque tout si le minimum n'est pas atteint !
+                }
+            } else {
+                if (!heureRetrait) {
+                    afficherNotification("⚠️ Veuillez indiquer une heure de retrait.");
+                    return;
+                }
+            }
+            // -- FIN DES VÉRIFICATIONS --
 
             const nouvelleCommande = {
                 items: panier,
@@ -306,21 +426,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     panier = [];
                     mettreAJourPanier();
-                    
                     if (modalCheckout) modalCheckout.classList.add('cache');
                     if (panneauPanier) panneauPanier.classList.add('cache');
                     
                     window.location.href = 'confirmation.html';
                 } else {
-                    alert("Erreur lors de la validation de la commande.");
+                    afficherNotification("❌ Erreur lors de la validation.");
                 }
             } catch (err) {
                 console.error("Erreur réseau :", err);
-                alert("Impossible de contacter le serveur de la pizzeria.");
+                afficherNotification("❌ Impossible de contacter le serveur de la pizzeria.");
             }
         };
     }
 });
 
-// Lancement du chargement initial du menu
+// Lancement au démarrage
 chargerMenuDepuisAPI('tous');

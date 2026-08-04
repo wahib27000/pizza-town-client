@@ -34,9 +34,11 @@ function afficherMenu(categorieFiltre = 'tous') {
     if (!grillePizzas) return;
     grillePizzas.innerHTML = "";
     
-    const produitsFiltres = categorieFiltre === 'tous' 
-        ? produits 
-        : produits.filter(p => p.categorie === categorieFiltre);
+    // --- NOUVEAUTÉ : On filtre pour cacher les produits en rupture de stock (Kill-Switch) ---
+    const produitsFiltres = produits.filter(p => 
+        p.disponible !== false && 
+        (categorieFiltre === 'tous' || p.categorie === categorieFiltre)
+    );
 
     if (produitsFiltres.length === 0) {
         grillePizzas.innerHTML = `<p style="text-align: center; color: #888; grid-column: 1/-1; padding: 40px;">Aucun produit disponible dans cette catégorie pour le moment.</p>`;

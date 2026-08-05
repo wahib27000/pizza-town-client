@@ -198,13 +198,13 @@
     </footer>
 
     <!-- ========================================== -->
-    <!-- NOUVELLES MODALES : COMPTES CLIENTS        -->
+    <!-- MODALES : COMPTES CLIENTS                  -->
     <!-- ========================================== -->
 
     <!-- MODALE CONNEXION -->
     <div id="modal-login" class="modal-overlay cache" style="position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display:flex; justify-content:center; align-items:center; z-index:2000;">
         <div style="background: white; color: #333; padding: 30px; border-radius: 12px; width: 90%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative;">
-            <button onclick="fermerModalesAuth()" class="close-btn" style="position: absolute; top: 15px; right: 15px;">✕</button>
+            <button onclick="fermerModalesAuth()" class="close-btn" style="position: absolute; top: 15px; right: 15px; background: transparent; cursor: pointer;">✕</button>
             <h2 style="margin-top: 0; color: #E63946; text-align: center;">Connexion</h2>
             <form id="form-login" onsubmit="handleLogin(event)">
                 <input type="email" id="login-email" placeholder="Adresse Email" required style="width:100%; padding:10px; margin-bottom:15px; border-radius:6px; border:1px solid #ccc; box-sizing: border-box;">
@@ -221,7 +221,7 @@
     <!-- MODALE INSCRIPTION -->
     <div id="modal-register" class="modal-overlay cache" style="position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display:flex; justify-content:center; align-items:center; z-index:2000;">
         <div style="background: white; color: #333; padding: 30px; border-radius: 12px; width: 90%; max-width: 450px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; max-height: 90vh; overflow-y: auto;">
-            <button onclick="fermerModalesAuth()" class="close-btn" style="position: absolute; top: 15px; right: 15px;">✕</button>
+            <button onclick="fermerModalesAuth()" class="close-btn" style="position: absolute; top: 15px; right: 15px; background: transparent; cursor: pointer;">✕</button>
             <h2 style="margin-top: 0; color: #E63946; text-align: center;">Créer un compte</h2>
             <form id="form-register" onsubmit="handleRegister(event)">
                 <input type="text" id="reg-nom" placeholder="Prénom et Nom" required style="width:100%; padding:10px; margin-bottom:10px; border-radius:6px; border:1px solid #ccc; box-sizing: border-box;">
@@ -247,7 +247,7 @@
     <!-- MODALE MOT DE PASSE OUBLIÉ -->
     <div id="modal-forgot" class="modal-overlay cache" style="position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display:flex; justify-content:center; align-items:center; z-index:2000;">
         <div style="background: white; color: #333; padding: 30px; border-radius: 12px; width: 90%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative;">
-            <button onclick="fermerModalesAuth()" class="close-btn" style="position: absolute; top: 15px; right: 15px;">✕</button>
+            <button onclick="fermerModalesAuth()" class="close-btn" style="position: absolute; top: 15px; right: 15px; background: transparent; cursor: pointer;">✕</button>
             <h2 style="margin-top: 0; color: #E63946; text-align: center;">Mot de passe oublié</h2>
             <p style="font-size: 0.9rem; text-align: center; margin-bottom: 20px;">Entrez votre email pour recevoir un lien de réinitialisation.</p>
             <form id="form-forgot" onsubmit="handleForgot(event)">
@@ -260,22 +260,47 @@
         </div>
     </div>
 
-    <!-- MODALE ESPACE CLIENT (DASHBOARD) -->
+    <!-- MODALE ESPACE CLIENT (DASHBOARD PREMIUM) -->
     <div id="modal-account" class="modal-overlay cache" style="position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display:flex; justify-content:center; align-items:center; z-index:2000;">
-        <div style="background: white; color: #333; padding: 30px; border-radius: 12px; width: 90%; max-width: 500px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative;">
-            <button onclick="fermerModalesAuth()" class="close-btn" style="position: absolute; top: 15px; right: 15px;">✕</button>
-            <h2 style="margin-top: 0; color: #2a9d8f; text-align: center;">Mon Espace</h2>
+        <div style="background: white; color: #333; padding: 0; border-radius: 12px; width: 90%; max-width: 600px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; overflow: hidden;">
             
-            <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #eee;">
-                <h4 style="margin: 0 0 10px 0; color: #333;">Mes Informations</h4>
-                <p style="margin: 3px 0; font-size: 0.9rem;"><b>Nom :</b> <span id="acc-nom"></span></p>
-                <p style="margin: 3px 0; font-size: 0.9rem;"><b>Email :</b> <span id="acc-email"></span></p>
-                <p style="margin: 3px 0; font-size: 0.9rem;"><b>Téléphone :</b> <span id="acc-tel"></span></p>
-                <p style="margin: 3px 0; font-size: 0.9rem;"><b>Adresse par défaut :</b> <span id="acc-adresse"></span></p>
+            <!-- En-tête du Dashboard -->
+            <div style="background: #1a1a1a; color: white; padding: 30px; text-align: center; position: relative;">
+                <button onclick="fermerModalesAuth()" class="close-btn" style="position: absolute; top: 15px; right: 15px; color: white; border-color: rgba(255,255,255,0.3); background: transparent; cursor: pointer;">✕</button>
+                <div style="font-size: 3.5rem; margin-bottom: 10px; line-height: 1;">🧑‍🍳</div>
+                <h2 style="margin: 0; font-size: 1.6rem; font-weight: 600;">Bonjour, <span id="acc-prenom"></span> !</h2>
+                <p style="margin: 5px 0 0 0; color: #aaa; font-size: 0.9rem;">Bienvenue dans votre espace Pizza Town</p>
             </div>
 
-            <div style="text-align: center; margin-top: 20px;">
-                <button onclick="handleLogout()" style="background: #E63946; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer;">Déconnexion</button>
+            <!-- Corps du Dashboard -->
+            <div style="padding: 30px; max-height: 60vh; overflow-y: auto;">
+                
+                <!-- Section : Informations -->
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">
+                    <h3 style="margin: 0; color: #E63946; font-size: 1.1rem;">📝 Mes Informations</h3>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; background: #f9f9f9; padding: 20px; border-radius: 8px; border: 1px solid #eaeaea;">
+                    <div><span style="color:#888; font-size:0.75rem; text-transform:uppercase; font-weight:bold;">Nom complet</span><br><strong id="acc-nom" style="font-size:0.95rem;"></strong></div>
+                    <div><span style="color:#888; font-size:0.75rem; text-transform:uppercase; font-weight:bold;">Email</span><br><strong id="acc-email" style="font-size:0.95rem;"></strong></div>
+                    <div><span style="color:#888; font-size:0.75rem; text-transform:uppercase; font-weight:bold;">Téléphone</span><br><strong id="acc-tel" style="font-size:0.95rem;"></strong></div>
+                    <div><span style="color:#888; font-size:0.75rem; text-transform:uppercase; font-weight:bold;">Adresse par défaut</span><br><strong id="acc-adresse" style="font-size:0.95rem;"></strong></div>
+                </div>
+
+                <!-- Section : Historique de commandes -->
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">
+                    <h3 style="margin: 0; color: #E63946; font-size: 1.1rem;">🍕 Historique des Commandes</h3>
+                </div>
+
+                <div id="acc-historique" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+                    <!-- L'historique sera injecté ici par JavaScript -->
+                    <p style="color: #888; font-style: italic; text-align: center; padding: 10px;">Chargement de vos commandes...</p>
+                </div>
+
+                <!-- Bouton de Déconnexion -->
+                <div style="text-align: center; margin-top: 30px;">
+                    <button onclick="handleLogout()" style="background: transparent; color: #E63946; border: 2px solid #E63946; padding: 10px 25px; border-radius: 25px; font-weight: bold; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='#E63946'; this.style.color='white'" onmouseout="this.style.background='transparent'; this.style.color='#E63946'">Déconnexion</button>
+                </div>
             </div>
         </div>
     </div>

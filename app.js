@@ -399,14 +399,67 @@ function mettreAJourUICompte() {
 function gererClicCompte() {
     fermerModalesAuth();
     if (currentUser) {
-        // Remplir le Dashboard client
+        // Remplir le Dashboard client premium
+        document.getElementById('acc-prenom').innerText = currentUser.nom.split(' ')[0];
         document.getElementById('acc-nom').innerText = currentUser.nom;
         document.getElementById('acc-email').innerText = currentUser.email;
         document.getElementById('acc-tel').innerText = currentUser.telephone || 'Non renseigné';
         document.getElementById('acc-adresse').innerText = (currentUser.adresse && currentUser.ville) ? `${currentUser.adresse}, ${currentUser.ville}` : 'Non renseignée';
+        
         document.getElementById('modal-account').classList.remove('cache');
+        
+        // Lancer la récupération de l'historique
+        chargerHistoriqueClient();
     } else {
         document.getElementById('modal-login').classList.remove('cache');
+    }
+}
+
+async function chargerHistoriqueClient() {
+    const conteneur = document.getElementById('acc-historique');
+    conteneur.innerHTML = '<p style="color: #888; font-style: italic; text-align: center; padding: 10px;">Chargement de vos commandes...</p>';
+    
+    try {
+        const res = await fetch(`${API_URL}/api/orders`);
+        const allOrders = await res.json();
+        
+        // On filtre pour ne garder que les commandes de ce client
+        const mesCommandes = allOrders.filter(cmd => cmd.userId === currentUser._id);
+        
+        if (mesCommandes.length === 0) {
+            conteneur.innerHTML = '<p style="color: #888; font-size: 0.9rem; text-align: center; padding: 10px;">Vous n\'avez pas encore passé de commande chez nous.</p>';
+            return;
+        }
+        
+        conteneur.innerHTML = ''; // On vide le texte de chargement
+        
+        mesCommandes.forEach(cmd => {
+            const dateStr = new Date(cmd.createdAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute:'2-digit' });
+            
+            // Badge visuel dynamique selon l'état de la commande
+            const estLivree = (cmd.status && cmd.status.toLowerCase().includes('livré'));
+            const couleurBadge = estLivree ? '#2a9d8f' : '#f39c12';
+            const texteBadge = estLivree ? 'Terminée' : (cmd.status || 'En cours');
+            
+            const div = document.createElement('div');
+            div.style.cssText = "border: 1px solid #eaeaea; padding: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; background: white; transition: 0.2s;";
+            
+            div.innerHTML = `
+                <div>
+                    <strong style="display: block; font-size: 0.95rem; color: #333; margin-bottom: 3px;">Commande du ${dateStr}</strong>
+                    <span style="font-size: 0.8rem; color: #888; font-weight: bold; text-transform: uppercase;">${cmd.mode} - ${cmd.items.length} article(s)</span>
+                </div>
+                <div style="text-align: right;">
+                    <strong style="display: block; color: #E63946; font-size: 1.1rem; margin-bottom: 5px;">${cmd.total.toFixed(2)} €</strong>
+                    <span style="font-size: 0.7rem; background: ${couleurBadge}; color: white; padding: 3px 8px; border-radius: 12px; font-weight: bold;">${texteBadge}</span>
+                </div>
+            `;
+            conteneur.appendChild(div);
+        });
+        
+    } catch (err) {
+        console.error(err);
+        conteneur.innerHTML = '<p style="color: #E63946; font-size: 0.9rem; text-align: center;">Impossible de charger l\'historique.</p>';
     }
 }
 

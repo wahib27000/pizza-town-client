@@ -7,6 +7,10 @@ let panier = [];
 let produits = [];
 let codePromoApplique = null; // Stocke la réduction active
 
+// NOUVEAU : GESTION DU COMPTE CLIENT
+let currentUser = JSON.parse(localStorage.getItem('pizzaTownUser') || 'null');
+let authToken = localStorage.getItem('pizzaTownToken');
+
 // Chargement du panier sauvegardé
 const panierSauvegarde = localStorage.getItem('panierPizzaTown');
 if (panierSauvegarde) {
@@ -371,7 +375,162 @@ function retirerDuPanier(index) {
 }
 
 // ==========================================
-// 6. RÈGLES DE LIVRAISON
+// 6. NOUVEAU : GESTION COMPTE CLIENT & AUTHENTIFICATION
+// ==========================================
+function mettreAJourUICompte() {
+    const btnCompte = document.getElementById('btn-compte');
+    if (!btnCompte) return;
+    
+    if (currentUser) {
+        // Afficher le prénom du client
+        const prenom = currentUser.nom.split(' ')[0];
+        btnCompte.innerHTML = `👤 ${prenom}`;
+        btnCompte.style.borderColor = '#2a9d8f';
+        btnCompte.style.color = '#2a9d8f';
+    } else {
+        btnCompte.innerHTML = `👤 Mon Compte`;
+        btnCompte.style.borderColor = '#333';
+        if (!document.body.classList.contains('dark-mode')) {
+            btnCompte.style.color = 'inherit';
+        }
+    }
+}
+
+function gererClicCompte() {
+    fermerModalesAuth();
+    if (currentUser) {
+        // Remplir le Dashboard client
+        document.getElementById('acc-nom').innerText = currentUser.nom;
+        document.getElementById('acc-email').innerText = currentUser.email;
+        document.getElementById('acc-tel').innerText = currentUser.telephone || 'Non renseigné';
+        document.getElementById('acc-adresse').innerText = (currentUser.adresse && currentUser.ville) ? `${currentUser.adresse}, ${currentUser.ville}` : 'Non renseignée';
+        document.getElementById('modal-account').classList.remove('cache');
+    } else {
+        document.getElementById('modal-login').classList.remove('cache');
+    }
+}
+
+function fermerModalesAuth() {
+    const login = document.getElementById('modal-login');
+    const register = document.getElementById('modal-register');
+    const forgot = document.getElementById('modal-forgot');
+    const account = document.getElementById('modal-account');
+    
+    if (login) login.classList.add('cache');
+    if (register) register.classList.add('cache');
+    if (forgot) forgot.classList.add('cache');
+    if (account) account.classList.add('cache');
+}
+
+function basculerModalAuth(target) {
+    fermerModalesAuth();
+    const modal = document.getElementById(`modal-${target}`);
+    if (modal) modal.classList.remove('cache');
+}
+
+async function handleRegister(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('button');
+    const oldText = btn.innerText;
+    btn.innerText = "⏳ Création...";
+    
+    const data = {
+        nom: document.getElementById('reg-nom').value,
+        email: document.getElementById('reg-email').value,
+        password: document.getElementById('reg-password').value,
+        telephone: document.getElementById('reg-tel').value,
+        adresse: document.getElementById('reg-adresse').value,
+        ville: document.getElementById('reg-ville').value,
+        accepteNewsletter: document.getElementById('reg-newsletter').checked
+    };
+    
+    try {
+        const res = await fetch(`${API_URL}/api/auth/register`, { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify(data) 
+        });
+        const result = await res.json();
+        
+        if (res.ok) {
+            afficherNotification("✅ Compte créé avec succès ! Connectez-vous.");
+            basculerModalAuth('login');
+        } else { 
+            afficherNotification(`❌ ${result.message}`); 
+        }
+    } catch (err) { 
+        afficherNotification("❌ Erreur de connexion au serveur."); 
+    }
+    btn.innerText = oldText;
+}
+
+async function handleLogin(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('button');
+    const oldText = btn.innerText;
+    btn.innerText = "⏳ Connexion...";
+    
+    const data = { 
+        email: document.getElementById('login-email').value, 
+        password: document.getElementById('login-password').value 
+    };
+    
+    try {
+        const res = await fetch(`${API_URL}/api/auth/login`, { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify(data) 
+        });
+        const result = await res.json();
+        
+        if (res.ok) {
+            currentUser = result.user; 
+            authToken = result.token;
+            localStorage.setItem('pizzaTownUser', JSON.stringify(currentUser));
+            localStorage.setItem('pizzaTownToken', authToken);
+            
+            mettreAJourUICompte();
+            fermerModalesAuth();
+            afficherNotification(`👋 Bienvenue, ${currentUser.nom} !`);
+            document.getElementById('form-login').reset();
+        } else { 
+            afficherNotification(`❌ ${result.message}`); 
+        }
+    } catch (err) { 
+        afficherNotification("❌ Erreur de connexion au serveur."); 
+    }
+    btn.innerText = oldText;
+}
+
+async function handleForgot(e) {
+    e.preventDefault();
+    const email = document.getElementById('forgot-email').value;
+    try {
+        await fetch(`${API_URL}/api/auth/forgot-password`, { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify({ email }) 
+        });
+        afficherNotification("✉️ Si l'email existe, un lien a été envoyé.");
+        basculerModalAuth('login');
+    } catch (err) { 
+        afficherNotification("❌ Erreur serveur"); 
+    }
+}
+
+function handleLogout() {
+    currentUser = null; 
+    authToken = null;
+    localStorage.removeItem('pizzaTownUser'); 
+    localStorage.removeItem('pizzaTownToken');
+    mettreAJourUICompte(); 
+    fermerModalesAuth();
+    afficherNotification("👋 Déconnexion réussie");
+}
+
+
+// ==========================================
+// 7. RÈGLES DE LIVRAISON
 // ==========================================
 const zonesLivraison = {
     "Incarville": 10, "La haye-le-comte": 10, "Louviers": 10, "Pinterville": 10,
@@ -398,7 +557,7 @@ function validerCommande(villeChoisie, totalPanier) {
 }
 
 // ==========================================
-// 7. PIZZA BUILDER & UPSELLING
+// 8. PIZZA BUILDER & UPSELLING
 // ==========================================
 function ouvrirPizzaBuilder() {
     const modal = document.getElementById('modal-builder');
@@ -434,7 +593,7 @@ function ajouterUpselling(nomProduit, prixProduit) {
 }
 
 // ==========================================
-// 8. TRACKER DE COMMANDE EN TEMPS RÉEL
+// 9. TRACKER DE COMMANDE EN TEMPS RÉEL
 // ==========================================
 let intervalSuivi = null;
 
@@ -492,7 +651,7 @@ function fermerTracker() {
 }
 
 // ==========================================
-// 9. ANIMATIONS & NOTIFICATIONS
+// 10. ANIMATIONS & NOTIFICATIONS
 // ==========================================
 function afficherNotification(message) {
     const ancienneNotif = document.getElementById('notif-flash');
@@ -541,14 +700,16 @@ function toggleDarkMode() {
     if (document.body.classList.contains('dark-mode')) {
         if (btn) btn.innerHTML = "☀️ Mode Jour";
         localStorage.setItem('pizzaTownTheme', 'dark');
+        mettreAJourUICompte(); // Force update color of user button
     } else {
         if (btn) btn.innerHTML = "🌙 Mode Nuit";
         localStorage.setItem('pizzaTownTheme', 'light');
+        mettreAJourUICompte(); // Force update color of user button
     }
 }
 
 // ==========================================
-// 10. INITIALISATION AU DÉMARRAGE DU SITE
+// 11. INITIALISATION AU DÉMARRAGE DU SITE
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
     if (localStorage.getItem('pizzaTownTheme') === 'dark') {
@@ -556,6 +717,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const btn = document.getElementById('dark-btn');
         if(btn) btn.innerHTML = "☀️ Mode Jour";
     }
+    
+    // Met à jour le bouton Mon Compte au lancement
+    mettreAJourUICompte();
 
     const slides = document.querySelectorAll(".carousel-slide");
     const dots = document.querySelectorAll(".dot");
@@ -601,6 +765,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             if (panier.length === 0) { afficherNotification("⚠️ Votre panier est vide !"); return; }
+            
+            // AUTO-REMPLISSAGE DU CHECKOUT SI CLIENT CONNECTÉ
+            if (currentUser) {
+                if(document.getElementById('nom-client')) document.getElementById('nom-client').value = currentUser.nom || '';
+                if(document.getElementById('tel-client')) document.getElementById('tel-client').value = currentUser.telephone || '';
+                if(document.getElementById('ville-client') && currentUser.ville) document.getElementById('ville-client').value = currentUser.ville;
+                if(document.getElementById('adresse-client') && currentUser.adresse) document.getElementById('adresse-client').value = currentUser.adresse;
+            }
+            
             modalCheckout.classList.remove('cache');
         };
     }
@@ -643,6 +816,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 address: adresseComplete,
                 heureRetrait: modeCommandeActuel === 'emporter' ? heureRetrait : 'Immédiat'
             };
+            
+            // LIAISON AVEC LE COMPTE CLIENT
+            if (currentUser && currentUser._id) {
+                nouvelleCommande.userId = currentUser._id;
+            }
 
             try {
                 const response = await fetch(`${API_URL}/api/orders`, {

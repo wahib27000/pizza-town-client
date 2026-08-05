@@ -277,7 +277,6 @@ function appliquerPromosAutomatiques(itemsPanier) {
     return panierMaj;
 }
 
-// Fonction de vérification du code promo sécurisée (évite le plantage undefined)
 async function verifierCodePromo() {
     const inputCode = document.getElementById('input-code-promo');
     if (!inputCode) return;
@@ -293,8 +292,6 @@ async function verifierCodePromo() {
         if (!res.ok) throw new Error("Erreur serveur");
         
         const promos = await res.json();
-        
-        // Recherche ultra-sécurisée : vérifie que p et p.code existent pour éviter les plantages
         const promoTrouvee = promos.find(p => p && p.code && p.code.toUpperCase() === codeSaisi);
 
         if (promoTrouvee) {
@@ -375,14 +372,13 @@ function retirerDuPanier(index) {
 }
 
 // ==========================================
-// 6. NOUVEAU : GESTION COMPTE CLIENT & AUTHENTIFICATION
+// 6. GESTION COMPTE CLIENT & AUTHENTIFICATION
 // ==========================================
 function mettreAJourUICompte() {
     const btnCompte = document.getElementById('btn-compte');
     if (!btnCompte) return;
     
     if (currentUser) {
-        // Afficher le prénom du client
         const prenom = currentUser.nom.split(' ')[0];
         btnCompte.innerHTML = `👤 ${prenom}`;
         btnCompte.style.borderColor = '#2a9d8f';
@@ -399,7 +395,6 @@ function mettreAJourUICompte() {
 function gererClicCompte() {
     fermerModalesAuth();
     if (currentUser) {
-        // Remplir le Dashboard client premium
         document.getElementById('acc-prenom').innerText = currentUser.nom.split(' ')[0];
         document.getElementById('acc-nom').innerText = currentUser.nom;
         document.getElementById('acc-email').innerText = currentUser.email;
@@ -407,8 +402,6 @@ function gererClicCompte() {
         document.getElementById('acc-adresse').innerText = (currentUser.adresse && currentUser.ville) ? `${currentUser.adresse}, ${currentUser.ville}` : 'Non renseignée';
         
         document.getElementById('modal-account').classList.remove('cache');
-        
-        // Lancer la récupération de l'historique
         chargerHistoriqueClient();
     } else {
         document.getElementById('modal-login').classList.remove('cache');
@@ -423,26 +416,28 @@ async function chargerHistoriqueClient() {
         const res = await fetch(`${API_URL}/api/orders`);
         const allOrders = await res.json();
         
-        // On filtre pour ne garder que les commandes de ce client
-        const mesCommandes = allOrders.filter(cmd => cmd.userId === currentUser._id);
+        console.log("Mon ID Client :", currentUser._id);
+        
+        // LA LIGNE MAGIQUE CORRIGÉE : On utilise String() pour garantir la correspondance
+        const mesCommandes = allOrders.filter(cmd => cmd.userId && String(cmd.userId) === String(currentUser._id));
         
         if (mesCommandes.length === 0) {
             conteneur.innerHTML = '<p style="color: #888; font-size: 0.9rem; text-align: center; padding: 10px;">Vous n\'avez pas encore passé de commande chez nous.</p>';
             return;
         }
         
-        conteneur.innerHTML = ''; // On vide le texte de chargement
+        conteneur.innerHTML = ''; 
         
-        mesCommandes.forEach(cmd => {
+        // On affiche les commandes de la plus récente à la plus ancienne avec .reverse()
+        mesCommandes.reverse().forEach(cmd => {
             const dateStr = new Date(cmd.createdAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute:'2-digit' });
             
-            // Badge visuel dynamique selon l'état de la commande
             const estLivree = (cmd.status && cmd.status.toLowerCase().includes('livré'));
             const couleurBadge = estLivree ? '#2a9d8f' : '#f39c12';
             const texteBadge = estLivree ? 'Terminée' : (cmd.status || 'En cours');
             
             const div = document.createElement('div');
-            div.style.cssText = "border: 1px solid #eaeaea; padding: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; background: white; transition: 0.2s;";
+            div.style.cssText = "border: 1px solid #eaeaea; padding: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; background: white; margin-bottom: 10px; transition: 0.2s;";
             
             div.innerHTML = `
                 <div>

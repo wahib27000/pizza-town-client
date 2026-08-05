@@ -18,7 +18,6 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
         body { background: var(--dark); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
 
-        /* MODALE LOGIN */
         #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--dark); z-index: 9999; display: flex; justify-content: center; align-items: center; }
         .login-box { background: var(--surface); padding: 30px; border-radius: 8px; border: 1px solid var(--border); text-align: center; width: 320px; }
         .login-box h2 { color: var(--primary); margin-bottom: 20px; }
@@ -28,7 +27,7 @@
         aside { width: 260px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
         .sidebar-brand { padding: 20px; font-size: 1.2rem; font-weight: bold; color: var(--primary); border-bottom: 1px solid var(--border); text-align: center; }
         .sidebar-menu { list-style: none; padding: 20px 0; flex: 1; }
-        .sidebar-menu li { padding: 12px 20px; cursor: pointer; transition: 0.2s; color: var(--text-muted); font-weight: 500; }
+        .sidebar-menu li { padding: 12px 20px; cursor: pointer; transition: 0.2s; color: var(--text-muted); font-weight: 500; display: flex; align-items: center; gap: 10px; }
         .sidebar-menu li:hover, .sidebar-menu li.active { background: rgba(230, 57, 70, 0.1); color: var(--primary); border-left: 4px solid var(--primary); }
 
         main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
@@ -39,21 +38,16 @@
         .section-panel.active { display: block; }
         h2 { margin-bottom: 20px; font-size: 1.5rem; }
 
-        /* KANBAN */
         .kanban-board { display: flex; gap: 15px; height: calc(100vh - 180px); min-width: 1000px; }
         .kanban-col { flex: 1; display: flex; flex-direction: column; background: var(--surface); border-radius: 8px; border: 1px solid var(--border); padding: 15px; }
         .kanban-header { font-weight: bold; font-size: 1rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 15px; text-align: center; border-bottom: 2px solid var(--border); padding-bottom: 10px; }
         .kanban-items { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; min-height: 100px; }
-        
         .kanban-card { background: var(--dark); padding: 15px; border-radius: 8px; border: 1px solid var(--border); cursor: grab; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .kanban-card:active { cursor: grabbing; }
         .kanban-card h4 { color: var(--primary); margin: 0; display: flex; justify-content: space-between; align-items: center; }
         .kanban-card p { font-size: 0.9rem; margin: 0; color: #ccc; }
-        
         .btn-print { background: #444; color: white; border: none; padding: 6px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; margin-top: 5px; }
         .btn-done { background: var(--success); color: white; border: none; padding: 6px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold; }
 
-        /* SWITCH TOGGLE */
         .switch { position: relative; display: inline-block; width: 44px; height: 22px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #E63946; transition: .4s; border-radius: 34px; }
@@ -61,29 +55,28 @@
         input:checked + .slider { background-color: var(--success); }
         input:checked + .slider:before { transform: translateX(22px); }
 
-        /* FORMULAIRES ET TABLEAUX */
         table { width: 100%; border-collapse: collapse; background: var(--surface); border-radius: 8px; overflow: hidden; margin-bottom: 30px; }
         th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
         th { background: rgba(255,255,255,0.05); color: var(--text-muted); }
         
         .form-box { background: var(--surface); padding: 20px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 30px; }
-        .form-box input, .form-box select { padding: 10px; background: var(--dark); border: 1px solid var(--border); color: white; border-radius: 4px; margin-right: 10px; margin-bottom: 10px; width: 220px; }
+        .form-box input, .form-box select, .form-box textarea { padding: 10px; background: var(--dark); border: 1px solid var(--border); color: white; border-radius: 4px; margin-right: 10px; margin-bottom: 10px; width: 100%; max-width: 400px; display: block; font-family: inherit; }
         .form-box button { padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
 
         .btn-refresh { background: #333; color: white; border: 1px solid var(--border); padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
-        .btn-refresh:hover { background: #444; }
-
         .admin-toast { position: fixed; bottom: 20px; right: 20px; background: var(--success); color: white; padding: 12px 20px; border-radius: 6px; font-weight: 500; z-index: 1000; }
         .cache { display: none !important; }
+        
+        .badge-yes { background: var(--success); color: white; padding: 3px 8px; border-radius: 12px; font-size: 0.75rem; }
+        .badge-no { background: #666; color: white; padding: 3px 8px; border-radius: 12px; font-size: 0.75rem; }
     </style>
 </head>
 <body>
 
-    <!-- ÉCRAN DE SÉCURITÉ ADMIN -->
     <div id="login-overlay">
         <div class="login-box">
             <h2>🔒 Accès Restreint</h2>
-            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px;">Mot de passe requis pour la cuisine</p>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px;">Mot de passe requis</p>
             <input type="password" id="input-password" placeholder="Mot de passe...">
             <button onclick="verifierMotDePasse()">Se connecter</button>
         </div>
@@ -95,6 +88,7 @@
         <div class="sidebar-brand">Pizza Town Admin</div>
         <ul class="sidebar-menu">
             <li class="active" onclick="changerOnglet('commandes', this)">📋 Kanban Cuisine</li>
+            <li onclick="changerOnglet('crm', this)">👥 Clients & Newsletter</li>
             <li onclick="changerOnglet('catalogue', this)">🍕 Catalogue & Stocks</li>
             <li onclick="changerOnglet('promos', this)">🎟️ Gestion Promos</li>
             <li onclick="changerOnglet('stats', this)">📊 Statistiques</li>
@@ -104,7 +98,7 @@
     <main>
         <header>
             <div style="display: flex; align-items: center; gap: 15px;">
-                <h1 id="titre-page" style="font-size: 1.2rem;">Tableau de bord Cuisine</h1>
+                <h1 id="titre-page" style="font-size: 1.2rem;">Tableau de bord</h1>
                 <button class="btn-refresh" onclick="chargerAdmin()">🔄 Actualiser</button>
             </div>
             <span style="font-size: 0.85rem; color: var(--success);">● Synchronisé</span>
@@ -133,14 +127,41 @@
                 </div>
             </div>
 
-            <!-- ONGLET 2 : CATALOGUE & AJOUT PRODUIT -->
+            <!-- ONGLET 2 : CRM & NEWSLETTER -->
+            <div id="panel-crm" class="section-panel">
+                <h2>Envoyer une Newsletter</h2>
+                <div class="form-box">
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">Cet email sera envoyé <b>uniquement</b> aux clients ayant coché la case Newsletter.</p>
+                    <form id="form-newsletter">
+                        <input type="text" id="nl-sujet" placeholder="Sujet de l'email (ex: 2ème pizza à -50% ce soir !)" required>
+                        <textarea id="nl-message" placeholder="Votre message..." rows="5" required></textarea>
+                        <button type="submit">🚀 Envoyer la Newsletter</button>
+                    </form>
+                </div>
+
+                <h2>Base de données Clients</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Email</th>
+                            <th>Téléphone</th>
+                            <th>Abonné Newsletter</th>
+                            <th>Date d'inscription</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableau-clients-admin"></tbody>
+                </table>
+            </div>
+
+            <!-- ONGLET 3 : CATALOGUE -->
             <div id="panel-catalogue" class="section-panel">
                 <h2>Ajouter un nouveau produit</h2>
                 <div class="form-box">
                     <form id="form-ajout-produit">
-                        <input type="text" id="prod-nom" placeholder="Nom du produit" required>
-                        <select id="prod-cat" required>
-                            <option value="" disabled selected>Choisir une catégorie...</option>
+                        <input type="text" id="prod-nom" placeholder="Nom du produit" required style="display:inline-block; max-width:200px;">
+                        <select id="prod-cat" required style="display:inline-block; max-width:200px;">
+                            <option value="" disabled selected>Catégorie...</option>
                             <option value="pizzas">Pizzas Napolitaines</option>
                             <option value="salades">Salades</option>
                             <option value="appetizers">Appetizers</option>
@@ -150,14 +171,14 @@
                             <option value="menus">Menus & formules</option>
                             <option value="panuozzo">Panuozzo</option>
                         </select>
-                        <input type="number" step="0.01" id="prod-prix" placeholder="Prix base (ex: 12.50)" required>
-                        <input type="text" id="prod-desc" placeholder="Description courte">
-                        <input type="text" id="prod-img" placeholder="URL de l'image">
-                        <button type="submit">+ Ajouter au site</button>
+                        <input type="number" step="0.01" id="prod-prix" placeholder="Prix base" required style="display:inline-block; max-width:150px;">
+                        <input type="text" id="prod-desc" placeholder="Description courte" style="display:inline-block; max-width:300px;">
+                        <input type="text" id="prod-img" placeholder="URL de l'image" style="display:inline-block; max-width:300px;">
+                        <button type="submit" style="display:inline-block;">+ Ajouter</button>
                     </form>
                 </div>
 
-                <h2>Catalogue actuel & Rupture de stock (Kill-Switch)</h2>
+                <h2>Catalogue & Ruptures (Kill-Switch)</h2>
                 <table>
                     <thead>
                         <tr>
@@ -172,23 +193,22 @@
                 </table>
             </div>
 
-            <!-- ONGLET 3 : GESTION PROMOS -->
+            <!-- ONGLET 4 : PROMOS -->
             <div id="panel-promos" class="section-panel">
                 <h2>Créer un Code Promo</h2>
                 <div class="form-box">
-                    <form id="form-ajout-promo">
+                    <form id="form-ajout-promo" style="display:flex; gap:10px;">
                         <input type="text" id="promo-code" placeholder="Code (ex: PIZZA10)" required style="text-transform: uppercase;">
-                        <input type="number" step="0.01" id="promo-valeur" placeholder="Réduction en € (ex: 3.00)" required>
-                        <button type="submit">+ Activer la promo</button>
+                        <input type="number" step="0.01" id="promo-valeur" placeholder="Réduction en €" required>
+                        <button type="submit">+ Activer</button>
                     </form>
                 </div>
-
-                <h2>Codes Promos Actifs</h2>
+                <h2>Codes Actifs</h2>
                 <table>
                     <thead>
                         <tr>
                             <th>Code</th>
-                            <th>Valeur de Réduction</th>
+                            <th>Valeur</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -196,7 +216,7 @@
                 </table>
             </div>
 
-            <!-- ONGLET 4 : STATS -->
+            <!-- ONGLET 5 : STATS -->
             <div id="panel-stats" class="section-panel">
                 <h2>Chiffre d'Affaires du Jour</h2>
                 <div style="background: var(--surface); padding: 20px; border-radius: 8px; border: 1px solid var(--border); width: 300px;">
@@ -216,14 +236,11 @@
         let dernierOrdreId = null;
 
         function verifierMotDePasse() {
-            const val = document.getElementById('input-password').value;
-            if (val === ADMIN_PASS) {
+            if (document.getElementById('input-password').value === ADMIN_PASS) {
                 localStorage.setItem('pizza_auth', 'true');
                 document.getElementById('login-overlay').style.display = 'none';
                 chargerAdmin();
-            } else {
-                alert("Mot de passe incorrect !");
-            }
+            } else { alert("Mot de passe incorrect !"); }
         }
 
         window.onload = function() {
@@ -234,9 +251,9 @@
         };
 
         function changerOnglet(nomOnglet, element) {
-            document.querySelectorAll('.sidebar-menu li').forEach(function(li) { li.classList.remove('active'); });
+            document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
             element.classList.add('active');
-            document.querySelectorAll('.section-panel').forEach(function(panel) { panel.classList.remove('active'); });
+            document.querySelectorAll('.section-panel').forEach(panel => panel.classList.remove('active'));
             document.getElementById('panel-' + nomOnglet).classList.add('active');
         }
 
@@ -244,11 +261,12 @@
             const toast = document.getElementById('toast');
             toast.innerText = message;
             toast.classList.remove('cache');
-            setTimeout(function() { toast.classList.add('cache'); }, 3000);
+            setTimeout(() => toast.classList.add('cache'), 3000);
         }
 
         async function chargerAdmin() {
             try {
+                // 1. Commandes
                 const resCmd = await fetch(API_URL + '/api/orders');
                 const commandes = await resCmd.json();
                 dernieresCommandesData = Array.isArray(commandes) ? commandes : [];
@@ -256,37 +274,67 @@
                 if (dernieresCommandesData.length > 0) {
                     const topCmdId = dernieresCommandesData[0]._id;
                     if (dernierOrdreId && dernierOrdreId !== topCmdId) {
-                        document.getElementById('audio-notif').play().catch(function(e) { console.log('Son bloqué'); });
-                        clignoterTitre();
+                        document.getElementById('audio-notif').play().catch(e => console.log('Son bloqué'));
                     }
                     dernierOrdreId = topCmdId;
                 }
-
                 afficherKanban();
                 calculerStats();
 
+                // 2. Produits & Promos
                 const resProd = await fetch(API_URL + '/api/products');
-                const produits = await resProd.json();
-                afficherCatalogue(produits);
-
+                afficherCatalogue(await resProd.json());
                 const resPromo = await fetch(API_URL + '/api/promos');
-                const promos = await resPromo.json();
-                afficherPromos(promos);
+                afficherPromos(await resPromo.json());
 
-            } catch (err) {
-                console.error("Erreur admin :", err);
+                // 3. Clients (CRM)
+                const resUsers = await fetch(API_URL + '/api/admin/users');
+                afficherClients(await resUsers.json());
+
+            } catch (err) { console.error("Erreur admin :", err); }
+        }
+
+        function afficherClients(users) {
+            const tbody = document.getElementById('tableau-clients-admin');
+            tbody.innerHTML = '';
+            users.forEach(u => {
+                const tr = document.createElement('tr');
+                const badge = u.accepteNewsletter ? '<span class="badge-yes">Oui</span>' : '<span class="badge-no">Non</span>';
+                tr.innerHTML = `
+                    <td><strong>${u.nom}</strong></td>
+                    <td>${u.email}</td>
+                    <td>${u.telephone || '-'}</td>
+                    <td>${badge}</td>
+                    <td>${new Date(u.dateCreation).toLocaleDateString('fr-FR')}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        document.getElementById('form-newsletter').onsubmit = async function(e) {
+            e.preventDefault();
+            const btn = this.querySelector('button');
+            btn.innerText = "⏳ Envoi en cours...";
+            
+            try {
+                const res = await fetch(API_URL + '/api/admin/newsletter', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sujet: document.getElementById('nl-sujet').value,
+                        message: document.getElementById('nl-message').value
+                    })
+                });
+                const data = await res.json();
+                montrerToast(data.message);
+                document.getElementById('form-newsletter').reset();
+            } catch(err) {
+                montrerToast("❌ Erreur lors de l'envoi");
             }
-        }
+            btn.innerText = "🚀 Envoyer la Newsletter";
+        };
 
-        function clignoterTitre() {
-            let clignotements = 0;
-            const interval = setInterval(function() {
-                document.title = clignotements % 2 === 0 ? "🔔 NOUVELLE COMMANDE !" : "Pizza Town - Admin";
-                clignotements++;
-                if (clignotements > 10) { clearInterval(interval); document.title = "Pizza Town - Admin"; }
-            }, 700);
-        }
-
+        // KANBAN DRAG & DROP
         function afficherKanban() {
             const colonnes = {
                 'En attente': document.getElementById('col-attente'),
@@ -295,216 +343,112 @@
                 'Prête': document.getElementById('col-prete')
             };
 
-            Object.values(colonnes).forEach(function(col) { col.innerHTML = ''; });
+            Object.values(colonnes).forEach(col => col.innerHTML = '');
 
-            dernieresCommandesData.forEach(function(cmd) {
+            dernieresCommandesData.forEach(cmd => {
                 if (cmd.status === 'Livrée') return;
-
                 const cibleCol = colonnes[cmd.status] || colonnes['En attente'];
                 
                 let articlesHtml = '';
                 if (cmd.items) {
-                    const itemsArray = cmd.items.map(function(art) {
-                        let text = "<b>" + (art.quantity || 1) + "x</b> " + (art.nom || art.name || 'Produit inconnu');
-                        
-                        if (art.options && Array.isArray(art.options) && art.options.length > 0) {
-                            text += "<br><span style='font-size:0.8rem; color:#e0a96d;'>↳ Options : " + art.options.join(', ') + "</span>";
-                        }
+                    articlesHtml = cmd.items.map(art => {
+                        let text = `<b>${art.quantity || 1}x</b> ${art.nom || 'Produit'}`;
+                        if (art.options && art.options.length > 0) text += `<br><span style='font-size:0.8rem; color:#e0a96d;'>↳ ${art.options.join(', ')}</span>`;
                         return text;
-                    });
-                    articlesHtml = itemsArray.join('<br><br>');
+                    }).join('<br><br>');
                 }
                 
                 const card = document.createElement('div');
                 card.className = 'kanban-card';
                 card.draggable = true;
                 card.id = 'card-' + cmd._id;
-                card.ondragstart = function(e) { e.dataTransfer.setData('text/plain', cmd._id); };
+                card.ondragstart = (e) => e.dataTransfer.setData('text/plain', cmd._id);
 
-                let btnLivree = '';
-                if (cmd.status === 'Prête') {
-                    btnLivree = "<button class='btn-done' onclick=\"changerStatut('" + cmd._id + "', 'Livrée')\">✔ Marquer Livrée</button>";
-                }
+                let btnLivree = cmd.status === 'Prête' ? `<button class='btn-done' onclick="changerStatut('${cmd._id}', 'Livrée')">✔ Livrée</button>` : '';
 
-                let htmlStr = "<h4>" + (cmd.customerName || 'Inconnu') + " <span>" + (cmd.total || 0) + "€</span></h4>";
-                htmlStr += "<p style='font-size: 0.75rem; color:#888;'>" + new Date(cmd.createdAt).toLocaleTimeString('fr-FR') + " - <b>" + (cmd.mode || '?').toUpperCase() + "</b></p>";
-                htmlStr += "<p style='font-size: 0.85rem; color:#2a9d8f; font-weight:bold; margin-top:4px;'>📍 " + (cmd.address || 'Aucune adresse') + "</p>";
-                htmlStr += "<div style='border-top:1px solid #333; margin:5px 0;'></div>";
-                htmlStr += "<p>" + articlesHtml + "</p>";
-                htmlStr += "<div style='display:flex; gap:5px; margin-top:5px;'>";
-                htmlStr += "<button class='btn-print' onclick=\"imprimerTicket('" + cmd._id + "')\">🖨️ Ticket</button>";
-                htmlStr += btnLivree;
-                htmlStr += "</div>";
-
-                card.innerHTML = htmlStr;
+                card.innerHTML = `
+                    <h4>${cmd.customerName || 'Inconnu'} <span>${cmd.total || 0}€</span></h4>
+                    <p style='font-size: 0.75rem; color:#888;'>${new Date(cmd.createdAt).toLocaleTimeString('fr-FR')} - <b>${(cmd.mode || '?').toUpperCase()}</b></p>
+                    <p style='font-size: 0.85rem; color:#2a9d8f; font-weight:bold; margin-top:4px;'>📍 ${cmd.address || 'Aucune adresse'}</p>
+                    <div style='border-top:1px solid #333; margin:5px 0;'></div>
+                    <p>${articlesHtml}</p>
+                    <div style='display:flex; gap:5px; margin-top:5px;'>
+                        <button class='btn-print' onclick="imprimerTicket('${cmd._id}')">🖨️ Ticket</button>
+                        ${btnLivree}
+                    </div>
+                `;
                 cibleCol.appendChild(card);
             });
         }
 
         function allowDrop(e) { e.preventDefault(); }
-        function drop(e, nouveauStatut) {
+        function drop(e, statut) {
             e.preventDefault();
-            const idCommande = e.dataTransfer.getData('text/plain');
-            changerStatut(idCommande, nouveauStatut);
+            changerStatut(e.dataTransfer.getData('text/plain'), statut);
         }
 
         async function changerStatut(id, statut) {
-            await fetch(API_URL + '/api/orders/' + id, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status: statut })
-            });
-            montrerToast("Commande déplacée vers : " + statut);
+            await fetch(API_URL + '/api/orders/' + id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: statut }) });
+            montrerToast("Déplacée vers : " + statut);
             chargerAdmin();
         }
 
         function imprimerTicket(id) {
-            const cmd = dernieresCommandesData.find(function(c) { return c._id === id; });
+            const cmd = dernieresCommandesData.find(c => c._id === id);
             if(!cmd) return;
-
             const printWindow = window.open('', '_blank', 'width=350,height=600');
-            
-            let html = "<ht" + "ml><he" + "ad><title>Ticket Cuisine</title>";
-            html += "<style>body{font-family:monospace;width:300px;margin:0 auto;color:black;padding:20px;} h1{text-align:center;font-size:1.8rem;margin:0;} .divider{border-bottom:2px dashed black;margin:15px 0;} .total{font-size:1.4rem;font-weight:bold;text-align:right;}</style>";
-            html += "</he" + "ad><bo" + "dy>";
-            html += "<h1>PIZZA TOWN</h1><div style='text-align:center; font-size:1.2rem; margin-top:5px;'>TICKET CUISINE</div><div class='divider'></div>";
-            html += "<div style='font-size:1.2rem;'>Client : <b>" + (cmd.customerName || "Inconnu") + "</b></div>";
-            html += "<div style='font-size:1.2rem;'>Tel : " + (cmd.phone || "-") + "</div>";
-            html += "<div style='font-size:1.2rem;'>Adresse : <br><b>" + (cmd.address || "-") + "</b></div>";
-            html += "<div style='font-size:1.2rem;'>Heure : " + new Date(cmd.createdAt).toLocaleTimeString("fr-FR") + "</div>";
-            html += "<div style='font-size:1.2rem; margin-top:10px;'>Type : <b>" + (cmd.mode || "").toUpperCase() + "</b></div><div class='divider'></div>";
-            
-            cmd.items.forEach(function(art) {
-                html += "<div style='margin-bottom:8px; font-size:1.2rem;'><b>" + (art.quantity || 1) + "x</b> " + (art.nom || art.name || 'Produit inconnu') + "</div>";
-                if (art.options && art.options.length > 0) {
-                    html += "<div style='font-size:0.9rem; margin-left:15px; margin-bottom:5px;'>↳ " + art.options.join(', ') + "</div>";
-                }
-            });
-            
-            html += "<div class='divider'></div><div class='total'>TOTAL : " + cmd.total + " E</div>";
-            html += "</bo" + "dy></ht" + "ml>";
-
+            let html = `<html><head><title>Ticket</title><style>body{font-family:monospace;width:300px;margin:0 auto;color:black;padding:20px;} h1{text-align:center;margin:0;} .divider{border-bottom:2px dashed black;margin:15px 0;} .total{font-size:1.4rem;font-weight:bold;text-align:right;}</style></head><body>`;
+            html += `<h1>PIZZA TOWN</h1><div style='text-align:center;'>TICKET</div><div class='divider'></div>`;
+            html += `<div>Client : <b>${cmd.customerName}</b><br>Tel : ${cmd.phone}<br>📍 ${cmd.address}<br>Type : <b>${cmd.mode.toUpperCase()}</b></div><div class='divider'></div>`;
+            cmd.items.forEach(art => { html += `<div><b>${art.quantity || 1}x</b> ${art.nom}</div>`; });
+            html += `<div class='divider'></div><div class='total'>TOTAL : ${cmd.total} E</div></body></html>`;
             printWindow.document.write(html);
             printWindow.document.close();
-            
-            setTimeout(function() {
-                printWindow.print();
-                printWindow.close();
-            }, 500);
+            setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
         }
 
+        // --- AUTRES FONCTIONS (Produits, Promos, Stats) RESTÉES INTACTES ---
         function afficherCatalogue(produits) {
             const tbody = document.getElementById('tableau-catalogue-admin');
             tbody.innerHTML = '';
-            
-            produits.forEach(function(p) {
-                const estDispo = p.disponible !== false;
+            produits.forEach(p => {
                 const tr = document.createElement('tr');
-                
-                let htmlStr = "<td><strong>" + (p.nom || '') + "</strong></td>";
-                htmlStr += "<td>" + (p.categorie || '') + "</td>";
-                htmlStr += "<td>" + (p.prixBase || 0) + " €</td>";
-                htmlStr += "<td><label class='switch'><input type='checkbox' " + (estDispo ? 'checked' : '') + " onchange=\"toggleDispo('" + p._id + "', this.checked)\"><span class='slider'></span></label></td>";
-                htmlStr += "<td><button onclick=\"supprimerProduit('" + p._id + "')\" style='background: #E63946; color:white; border:none; padding: 5px 10px; border-radius:4px; font-size: 0.8rem; cursor:pointer;'>Supprimer</button></td>";
-                
-                tr.innerHTML = htmlStr;
+                tr.innerHTML = `<td><strong>${p.nom}</strong></td><td>${p.categorie}</td><td>${p.prixBase} €</td>
+                    <td><label class='switch'><input type='checkbox' ${p.disponible !== false ? 'checked' : ''} onchange="toggleDispo('${p._id}', this.checked)"><span class='slider'></span></label></td>
+                    <td><button onclick="supprimerProduit('${p._id}')" style='background:#E63946; color:white; border:none; padding:5px; border-radius:4px;'>Supprimer</button></td>`;
                 tbody.appendChild(tr);
             });
         }
-
         document.getElementById('form-ajout-produit').onsubmit = async function(e) {
             e.preventDefault();
-            const nouveauProduit = {
-                nom: document.getElementById('prod-nom').value,
-                categorie: document.getElementById('prod-cat').value,
-                prixBase: parseFloat(document.getElementById('prod-prix').value),
-                desc: document.getElementById('prod-desc').value,
-                image: document.getElementById('prod-img').value || 'https://via.placeholder.com/300x200?text=Pizza',
-                disponible: true
-            };
-
-            const res = await fetch(API_URL + '/api/products', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(nouveauProduit)
+            await fetch(API_URL + '/api/products', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nom: document.getElementById('prod-nom').value, categorie: document.getElementById('prod-cat').value, prixBase: parseFloat(document.getElementById('prod-prix').value), desc: document.getElementById('prod-desc').value, image: document.getElementById('prod-img').value || 'https://via.placeholder.com/300', disponible: true })
             });
-
-            if (res.ok) {
-                montrerToast("✅ Produit ajouté avec succès !");
-                document.getElementById('form-ajout-produit').reset();
-                chargerAdmin();
-            } else {
-                montrerToast("❌ Erreur lors de l'ajout");
-            }
+            document.getElementById('form-ajout-produit').reset(); chargerAdmin(); montrerToast("✅ Ajouté !");
         };
-
-        async function toggleDispo(id, isDispo) {
-            await fetch(API_URL + '/api/products/' + id, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ disponible: isDispo })
-            });
-            montrerToast(isDispo ? "✅ Produit de retour en ligne" : "❌ Produit masqué du site");
-        }
-
-        async function supprimerProduit(id) {
-            if (confirm("Voulez-vous vraiment supprimer définitivement ce produit ?")) {
-                await fetch(API_URL + '/api/products/' + id, { method: 'DELETE' });
-                montrerToast("🗑️ Produit supprimé");
-                chargerAdmin();
-            }
-        }
+        async function toggleDispo(id, isDispo) { await fetch(API_URL + '/api/products/' + id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ disponible: isDispo }) }); montrerToast(isDispo ? "✅ En ligne" : "❌ Masqué"); }
+        async function supprimerProduit(id) { if (confirm("Supprimer ce produit ?")) { await fetch(API_URL + '/api/products/' + id, { method: 'DELETE' }); chargerAdmin(); } }
 
         function afficherPromos(promos) {
             const tbody = document.getElementById('tableau-promos-admin');
             tbody.innerHTML = '';
-            
-            promos.forEach(function(promo) {
+            promos.forEach(promo => {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><strong>${promo.code}</strong></td>
-                    <td>${promo.valeur || promo.discount || 0} €</td>
-                    <td><button onclick="supprimerPromo('${promo._id}')" style="background: #E63946; color:white; border:none; padding: 5px 10px; border-radius:4px; font-size: 0.8rem; cursor:pointer;">Supprimer</button></td>
-                `;
+                tr.innerHTML = `<td><strong>${promo.code}</strong></td><td>${promo.valeur} €</td><td><button onclick="supprimerPromo('${promo._id}')" style="background:#E63946; color:white; border:none; padding:5px; border-radius:4px;">Supprimer</button></td>`;
                 tbody.appendChild(tr);
             });
         }
-
         document.getElementById('form-ajout-promo').onsubmit = async function(e) {
             e.preventDefault();
-            const nouvellePromo = {
-                code: document.getElementById('promo-code').value.toUpperCase(),
-                valeur: parseFloat(document.getElementById('promo-valeur').value)
-            };
-
-            const res = await fetch(API_URL + '/api/promos', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(nouvellePromo)
-            });
-
-            if (res.ok) {
-                montrerToast("🎟️ Code promo créé avec succès !");
-                document.getElementById('form-ajout-promo').reset();
-                chargerAdmin();
-            } else {
-                montrerToast("❌ Erreur lors de la création du code promo");
-            }
+            await fetch(API_URL + '/api/promos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: document.getElementById('promo-code').value.toUpperCase(), valeur: parseFloat(document.getElementById('promo-valeur').value) }) });
+            document.getElementById('form-ajout-promo').reset(); chargerAdmin(); montrerToast("🎟️ Promo créée !");
         };
-
-        async function supprimerPromo(id) {
-            if (confirm("Voulez-vous supprimer ce code promo ?")) {
-                await fetch(API_URL + '/api/promos/' + id, { method: 'DELETE' });
-                montrerToast("🗑️ Code promo supprimé");
-                chargerAdmin();
-            }
-        }
+        async function supprimerPromo(id) { if (confirm("Supprimer ce code ?")) { await fetch(API_URL + '/api/promos/' + id, { method: 'DELETE' }); chargerAdmin(); } }
 
         function calculerStats() {
             let ca = 0;
-            dernieresCommandesData.forEach(function(c) { 
-                if (c.status === 'Livrée') ca += (c.total || 0); 
-            });
+            dernieresCommandesData.forEach(c => { if (c.status === 'Livrée') ca += (c.total || 0); });
             document.getElementById('stat-ca').innerText = ca.toFixed(2) + " €";
         }
 

@@ -86,7 +86,7 @@
     <!-- ÉCRAN DE SÉCURITÉ ADMIN -->
     <div id="login-overlay">
         <div class="login-box">
-            <h2>🔒 Accès Restreint</h2>
+            <h2>Accès Restreint</h2>
             <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px;">Mot de passe requis pour la cuisine</p>
             <input type="password" id="input-password" placeholder="Mot de passe...">
             <button onclick="verifierMotDePasse()">Se connecter</button>
@@ -98,11 +98,11 @@
     <aside>
         <div class="sidebar-brand">Pizza Town Admin</div>
         <ul class="sidebar-menu">
-            <li class="active" onclick="changerOnglet('commandes', this)">📋 Kanban Cuisine</li>
-            <li onclick="changerOnglet('crm', this)">👥 Clients & Newsletter</li>
-            <li onclick="changerOnglet('catalogue', this)">🍕 Catalogue & Stocks</li>
-            <li onclick="changerOnglet('promos', this)">🎟️ Gestion Promos</li>
-            <li onclick="changerOnglet('stats', this)">📊 Statistiques</li>
+            <li class="active" onclick="changerOnglet('commandes', this)">Kanban Cuisine</li>
+            <li onclick="changerOnglet('crm', this)">Clients & Newsletter</li>
+            <li onclick="changerOnglet('catalogue', this)">Catalogue & Stocks</li>
+            <li onclick="changerOnglet('promos', this)">Gestion Promos</li>
+            <li onclick="changerOnglet('stats', this)">Statistiques</li>
         </ul>
     </aside>
 
@@ -110,7 +110,7 @@
         <header>
             <div style="display: flex; align-items: center; gap: 15px;">
                 <h1 id="titre-page" style="font-size: 1.2rem;">Tableau de bord Cuisine</h1>
-                <button class="btn-refresh" onclick="chargerAdmin()">🔄 Actualiser</button>
+                <button class="btn-refresh" onclick="chargerAdmin()">Actualiser</button>
             </div>
             <span style="font-size: 0.85rem; color: var(--success);">● Synchronisé</span>
         </header>
@@ -120,19 +120,19 @@
             <div id="panel-commandes" class="section-panel active">
                 <div class="kanban-board">
                     <div class="kanban-col" ondragover="allowDrop(event)" ondrop="drop(event, 'En attente')">
-                        <div class="kanban-header">📝 En attente</div>
+                        <div class="kanban-header">En attente</div>
                         <div id="col-attente" class="kanban-items"></div>
                     </div>
                     <div class="kanban-col" ondragover="allowDrop(event)" ondrop="drop(event, 'En préparation')">
-                        <div class="kanban-header">🔪 En préparation</div>
+                        <div class="kanban-header">En préparation</div>
                         <div id="col-prepa" class="kanban-items"></div>
                     </div>
                     <div class="kanban-col" ondragover="allowDrop(event)" ondrop="drop(event, 'Au four')">
-                        <div class="kanban-header">🔥 Au four</div>
+                        <div class="kanban-header">Au four</div>
                         <div id="col-four" class="kanban-items"></div>
                     </div>
                     <div class="kanban-col" ondragover="allowDrop(event)" ondrop="drop(event, 'Prête')">
-                        <div class="kanban-header">✅ Prête</div>
+                        <div class="kanban-header">Prête</div>
                         <div id="col-prete" class="kanban-items"></div>
                     </div>
                 </div>
@@ -146,7 +146,7 @@
                     <form id="form-newsletter">
                         <input type="text" id="nl-sujet" placeholder="Sujet de l'email (ex: 2ème pizza à -50% ce soir !)" required>
                         <textarea id="nl-message" placeholder="Votre message pour les clients..." rows="5" required></textarea>
-                        <button type="submit">🚀 Envoyer la Newsletter</button>
+                        <button type="submit">Envoyer la Newsletter</button>
                     </form>
                 </div>
 
@@ -347,7 +347,7 @@
         function clignoterTitre() {
             let clignotements = 0;
             const interval = setInterval(function() {
-                document.title = clignotements % 2 === 0 ? "🔔 NOUVELLE COMMANDE !" : "Pizza Town - Admin";
+                document.title = clignotements % 2 === 0 ? "NOUVELLE COMMANDE !" : "Pizza Town - Admin";
                 clignotements++;
                 if (clignotements > 10) { clearInterval(interval); document.title = "Pizza Town - Admin"; }
             }, 700);
@@ -363,7 +363,7 @@
             dernieresCommandesData.forEach(function(cmd) {
                 if (cmd.status === 'Livrée') {
                     const dateObj = new Date(cmd.createdAt);
-                    const dateStr = dateObj.toLocaleDateString('fr-FR'); // Ex: 05/08/2026
+                    const dateStr = dateObj.toLocaleDateString('fr-FR'); 
 
                     if (!statsParJour[dateStr]) {
                         statsParJour[dateStr] = { ca: 0, count: 0, dateObj: dateObj };
@@ -443,7 +443,7 @@
             e.preventDefault();
             const btn = this.querySelector('button');
             const oldText = btn.innerText;
-            btn.innerText = "⏳ Envoi en cours...";
+            btn.innerText = "Envoi en cours...";
             
             const payload = {
                 sujet: document.getElementById('nl-sujet').value,
@@ -460,13 +460,13 @@
                 const data = await res.json();
                 
                 if(res.ok) {
-                    montrerToast(`✅ ${data.message}`);
+                    montrerToast(`Message envoyé : ${data.message}`);
                     document.getElementById('form-newsletter').reset();
                 } else {
-                    montrerToast(`❌ ${data.message || 'Erreur'}`);
+                    montrerToast(`Erreur : ${data.message || 'Erreur'}`);
                 }
             } catch(err) {
-                montrerToast("❌ Erreur serveur lors de l'envoi");
+                montrerToast("Erreur serveur lors de l'envoi");
             }
             
             btn.innerText = oldText;
@@ -511,16 +511,16 @@
 
                 let btnLivree = '';
                 if (cmd.status === 'Prête') {
-                    btnLivree = "<button class='btn-done' onclick=\"changerStatut('" + cmd._id + "', 'Livrée')\">✔ Marquer Livrée</button>";
+                    btnLivree = "<button class='btn-done' onclick=\"changerStatut('" + cmd._id + "', 'Livrée')\">Marquer Livrée</button>";
                 }
 
                 let htmlStr = "<h4>" + (cmd.customerName || 'Inconnu') + " <span>" + (cmd.total || 0) + "€</span></h4>";
                 htmlStr += "<p style='font-size: 0.75rem; color:#888;'>" + new Date(cmd.createdAt).toLocaleTimeString('fr-FR') + " - <b>" + (cmd.mode || '?').toUpperCase() + "</b></p>";
-                htmlStr += "<p style='font-size: 0.85rem; color:#2a9d8f; font-weight:bold; margin-top:4px;'>📍 " + (cmd.address || 'Aucune adresse') + "</p>";
+                htmlStr += "<p style='font-size: 0.85rem; color:#2a9d8f; font-weight:bold; margin-top:4px;'>Adresse : " + (cmd.address || 'Aucune adresse') + "</p>";
                 htmlStr += "<div style='border-top:1px solid #333; margin:5px 0;'></div>";
                 htmlStr += "<p>" + articlesHtml + "</p>";
                 htmlStr += "<div style='display:flex; gap:5px; margin-top:5px;'>";
-                htmlStr += "<button class='btn-print' onclick=\"imprimerTicket('" + cmd._id + "')\">🖨️ Ticket</button>";
+                htmlStr += "<button class='btn-print' onclick=\"imprimerTicket('" + cmd._id + "')\">Ticket</button>";
                 htmlStr += btnLivree;
                 htmlStr += "</div>";
 
@@ -621,11 +621,11 @@
             });
 
             if (res.ok) {
-                montrerToast("✅ Produit ajouté avec succès !");
+                montrerToast("Produit ajouté avec succès !");
                 document.getElementById('form-ajout-produit').reset();
                 chargerAdmin();
             } else {
-                montrerToast("❌ Erreur lors de l'ajout");
+                montrerToast("Erreur lors de l'ajout");
             }
         };
 
@@ -635,13 +635,13 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ disponible: isDispo })
             });
-            montrerToast(isDispo ? "✅ Produit de retour en ligne" : "❌ Produit masqué du site");
+            montrerToast(isDispo ? "Produit de retour en ligne" : "Produit masqué du site");
         }
 
         async function supprimerProduit(id) {
             if (confirm("Voulez-vous vraiment supprimer définitivement ce produit ?")) {
                 await fetch(API_URL + '/api/products/' + id, { method: 'DELETE' });
-                montrerToast("🗑️ Produit supprimé");
+                montrerToast("Produit supprimé");
                 chargerAdmin();
             }
         }
@@ -655,7 +655,7 @@
                 tr.innerHTML = `
                     <td><strong>${promo.code}</strong></td>
                     <td>${promo.valeur || promo.discount || 0} €</td>
-                    <td><button onclick="supprimerPromo('${promo._id}')" style="background: #E63946; color:white; border:none; padding: 5px 10px; border-radius:4px; font-size: 0.8rem; cursor:pointer;">Supprimer</button></td>
+                    <td><button onclick="supprimerPromo('${promo._id}')" style="background: #E63946; color:white; border:none; padding: 5px 10px; border-radius:4px; font-size: 0.8rem; cursor:pointer;'>Supprimer</button></td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -675,18 +675,18 @@
             });
 
             if (res.ok) {
-                montrerToast("🎟️ Code promo créé avec succès !");
+                montrerToast("Code promo créé avec succès !");
                 document.getElementById('form-ajout-promo').reset();
                 chargerAdmin();
             } else {
-                montrerToast("❌ Erreur lors de la création du code promo");
+                montrerToast("Erreur lors de la création du code promo");
             }
         };
 
         async function supprimerPromo(id) {
             if (confirm("Voulez-vous supprimer ce code promo ?")) {
                 await fetch(API_URL + '/api/promos/' + id, { method: 'DELETE' });
-                montrerToast("🗑️ Code promo supprimé");
+                montrerToast("Code promo supprimé");
                 chargerAdmin();
             }
         }

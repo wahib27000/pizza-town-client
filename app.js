@@ -5,9 +5,9 @@ const API_URL = "https://pizza-town-backend-1.onrender.com";
 let modeCommandeActuel = 'livraison';
 let panier = [];
 let produits = [];
-let codePromoApplique = null; // Stocke la réduction active
+let codePromoApplique = null;
 
-// NOUVEAU : GESTION DU COMPTE CLIENT
+// GESTION DU COMPTE CLIENT
 let currentUser = JSON.parse(localStorage.getItem('pizzaTownUser') || 'null');
 let authToken = localStorage.getItem('pizzaTownToken');
 
@@ -18,21 +18,16 @@ if (panierSauvegarde) {
 }
 
 // ==========================================
-// 1.1 KILL-SWITCH HORAIRE (Vérification si ouvert)
+// 1.1 KILL-SWITCH HORAIRE
 // ==========================================
 function verifierSiOuvert() {
     const now = new Date();
-    const day = now.getDay(); // 0 = Dimanche, 1 = Lundi, etc.
+    const day = now.getDay();
     const hour = now.getHours();
     const minutes = now.getMinutes();
     const timeInMins = hour * 60 + minutes;
 
-    // Horaires Pizza Town :
-    // Lundi - Jeudi : 11:30 - 14:30 (690 - 870) et 18:00 - 23:00 (1080 - 1380)
-    // Vendredi - Samedi : 11:30 - 14:30 (690 - 870) et 18:00 - 00:00 (1080 - 1440)
-    // Dimanche : 18:00 - 23:00 (1080 - 1380)
     let estOuvert = false;
-
     if (day >= 1 && day <= 4) {
         estOuvert = (timeInMins >= 690 && timeInMins <= 870) || (timeInMins >= 1080 && timeInMins <= 1380);
     } else if (day === 5 || day === 6) {
@@ -41,7 +36,7 @@ function verifierSiOuvert() {
         estOuvert = (timeInMins >= 1080 && timeInMins <= 1380);
     }
 
-    return true; // ⚠️ Laisse 'true' pour tester à tout moment, ou remplace par 'estOuvert' pour bloquer la nuit
+    return true; 
 }
 
 // ==========================================
@@ -87,7 +82,7 @@ function afficherMenu(categorieFiltre = 'tous') {
             const aujourdHui = new Date();
             const diffJours = (aujourdHui - dateCreation) / (1000 * 60 * 60 * 24);
             if (diffJours <= 21) {
-                badgeNewHTML = `<span style="position: absolute; top: 10px; right: 10px; background: #E63946; color: white; padding: 3px 8px; font-size: 0.7rem; font-weight: bold; border-radius: 4px; z-index: 2;">NEW 🍕</span>`;
+                badgeNewHTML = `<span style="position: absolute; top: 10px; right: 10px; background: #E63946; color: white; padding: 3px 8px; font-size: 0.7rem; font-weight: bold; border-radius: 4px; z-index: 2;">NEW</span>`;
             }
         }
 
@@ -213,7 +208,7 @@ function ajouterAuPanier(idProduit, btnElement) {
 
     const texteOriginal = btnElement.innerHTML;
     btnElement.classList.add('success');
-    btnElement.innerHTML = "✓ Ajouté !";
+    btnElement.innerHTML = "Ajouté !";
 
     setTimeout(() => {
         btnElement.classList.remove('success');
@@ -283,7 +278,7 @@ async function verifierCodePromo() {
     const codeSaisi = inputCode.value.trim().toUpperCase();
 
     if (!codeSaisi) {
-        afficherNotification("⚠️ Veuillez entrer un code promo.");
+        afficherNotification("Veuillez entrer un code promo.");
         return;
     }
 
@@ -296,16 +291,16 @@ async function verifierCodePromo() {
 
         if (promoTrouvee) {
             codePromoApplique = promoTrouvee;
-            afficherNotification(`🎟️ Code promo "${promoTrouvee.code}" appliqué (-${promoTrouvee.valeur}€) !`);
+            afficherNotification(`Code promo "${promoTrouvee.code}" appliqué (-${promoTrouvee.valeur}€) !`);
             mettreAJourPanier();
         } else {
-            afficherNotification("❌ Code promo invalide ou expiré.");
+            afficherNotification("Code promo invalide ou expiré.");
             codePromoApplique = null;
             mettreAJourPanier();
         }
     } catch (err) {
         console.error("Erreur promo :", err);
-        afficherNotification("❌ Erreur lors de la vérification du code.");
+        afficherNotification("Erreur lors de la vérification du code.");
     }
 }
 
@@ -321,7 +316,7 @@ function mettreAJourPanier() {
     let total = 0;
 
     if (panier.length === 0) {
-        listeArticles.innerHTML = `<p style="text-align: center; color: #888; padding: 30px; font-size: 0.95rem;">Votre panier est vide 🍕</p>`;
+        listeArticles.innerHTML = `<p style="text-align: center; color: #888; padding: 30px; font-size: 0.95rem;">Votre panier est vide</p>`;
         const prixTotalEl = document.getElementById('prix-total');
         if (prixTotalEl) prixTotalEl.innerText = "0.00 €";
         const btnPayerEl = document.getElementById('btn-payer');
@@ -355,7 +350,7 @@ function mettreAJourPanier() {
         if (total < 0) total = 0;
         const lignePromo = document.createElement('div');
         lignePromo.style.cssText = "font-size: 0.85rem; color: #2a9d8f; margin: 10px 0; font-weight: bold; text-align: center;";
-        lignePromo.innerText = `🎟️ Remise promo (${codePromoApplique.code}) : -${codePromoApplique.valeur.toFixed(2)} €`;
+        lignePromo.innerText = `Remise promo (${codePromoApplique.code}) : -${codePromoApplique.valeur.toFixed(2)} €`;
         listeArticles.appendChild(lignePromo);
     }
     
@@ -380,11 +375,11 @@ function mettreAJourUICompte() {
     
     if (currentUser) {
         const prenom = currentUser.nom.split(' ')[0];
-        btnCompte.innerHTML = `👤 ${prenom}`;
+        btnCompte.innerHTML = `${prenom}`;
         btnCompte.style.borderColor = '#2a9d8f';
         btnCompte.style.color = '#2a9d8f';
     } else {
-        btnCompte.innerHTML = `👤 Mon Compte`;
+        btnCompte.innerHTML = `Mon Compte`;
         btnCompte.style.borderColor = '#333';
         if (!document.body.classList.contains('dark-mode')) {
             btnCompte.style.color = 'inherit';
@@ -413,11 +408,8 @@ async function chargerHistoriqueClient() {
     conteneur.innerHTML = '<p style="color: #888; font-style: italic; text-align: center; padding: 10px;">Chargement de vos commandes...</p>';
     
     try {
-        // LE CORRECTIF EST LÀ : on ajoute ?t=timestamp pour empêcher le navigateur de cacher la réponse
         const res = await fetch(`${API_URL}/api/orders?t=${new Date().getTime()}`, { cache: 'no-store' });
         const allOrders = await res.json();
-        
-        console.log("Mon ID Client :", currentUser._id);
         
         const mesCommandes = allOrders.filter(cmd => cmd.userId && String(cmd.userId) === String(currentUser._id));
         
@@ -433,10 +425,9 @@ async function chargerHistoriqueClient() {
             
             const estLivree = (cmd.status && cmd.status.toLowerCase().includes('livré'));
             
-            // LA GESTION DES COULEURS EST LÀ
-            let couleurBadge = '#3498db'; // Bleu par défaut (En préparation)
-            if (cmd.status === 'En attente') couleurBadge = '#f39c12'; // Orange
-            if (estLivree) couleurBadge = '#2a9d8f'; // Vert
+            let couleurBadge = '#3498db'; 
+            if (cmd.status === 'En attente') couleurBadge = '#f39c12'; 
+            if (estLivree) couleurBadge = '#2a9d8f'; 
             
             const texteBadge = estLivree ? 'Terminée' : (cmd.status || 'En attente');
             
@@ -484,7 +475,7 @@ async function handleRegister(e) {
     e.preventDefault();
     const btn = e.target.querySelector('button');
     const oldText = btn.innerText;
-    btn.innerText = "⏳ Création...";
+    btn.innerText = "Création en cours...";
     
     const data = {
         nom: document.getElementById('reg-nom').value,
@@ -505,13 +496,13 @@ async function handleRegister(e) {
         const result = await res.json();
         
         if (res.ok) {
-            afficherNotification("✅ Compte créé avec succès ! Connectez-vous.");
+            afficherNotification("Compte créé avec succès ! Connectez-vous.");
             basculerModalAuth('login');
         } else { 
-            afficherNotification(`❌ ${result.message}`); 
+            afficherNotification(`Erreur : ${result.message}`); 
         }
     } catch (err) { 
-        afficherNotification("❌ Erreur de connexion au serveur."); 
+        afficherNotification("Erreur de connexion au serveur."); 
     }
     btn.innerText = oldText;
 }
@@ -520,7 +511,7 @@ async function handleLogin(e) {
     e.preventDefault();
     const btn = e.target.querySelector('button');
     const oldText = btn.innerText;
-    btn.innerText = "⏳ Connexion...";
+    btn.innerText = "Connexion en cours...";
     
     const data = { 
         email: document.getElementById('login-email').value, 
@@ -543,13 +534,13 @@ async function handleLogin(e) {
             
             mettreAJourUICompte();
             fermerModalesAuth();
-            afficherNotification(`👋 Bienvenue, ${currentUser.nom} !`);
+            afficherNotification(`Bienvenue, ${currentUser.nom} !`);
             document.getElementById('form-login').reset();
         } else { 
-            afficherNotification(`❌ ${result.message}`); 
+            afficherNotification(`Erreur : ${result.message}`); 
         }
     } catch (err) { 
-        afficherNotification("❌ Erreur de connexion au serveur."); 
+        afficherNotification("Erreur de connexion au serveur."); 
     }
     btn.innerText = oldText;
 }
@@ -563,10 +554,10 @@ async function handleForgot(e) {
             headers: { 'Content-Type': 'application/json' }, 
             body: JSON.stringify({ email }) 
         });
-        afficherNotification("✉️ Si l'email existe, un lien a été envoyé.");
+        afficherNotification("Si l'email existe, un lien a été envoyé.");
         basculerModalAuth('login');
     } catch (err) { 
-        afficherNotification("❌ Erreur serveur"); 
+        afficherNotification("Erreur serveur"); 
     }
 }
 
@@ -577,7 +568,7 @@ function handleLogout() {
     localStorage.removeItem('pizzaTownToken');
     mettreAJourUICompte(); 
     fermerModalesAuth();
-    afficherNotification("👋 Déconnexion réussie");
+    afficherNotification("Déconnexion réussie");
 }
 
 
@@ -597,12 +588,12 @@ const zonesLivraison = {
 
 function validerCommande(villeChoisie, totalPanier) {
     if (!zonesLivraison.hasOwnProperty(villeChoisie)) {
-        afficherNotification(`❌ Désolé, nous ne livrons pas à ${villeChoisie} (limite 15km autour de Louviers).`);
+        afficherNotification(`Désolé, nous ne livrons pas à ${villeChoisie} (limite 15km autour de Louviers).`);
         return false;
     }
     let minRequis = zonesLivraison[villeChoisie];
     if (totalPanier < minRequis) {
-        afficherNotification(`⚠️ Pour ${villeChoisie}, min. ${minRequis}€ (Il manque ${(minRequis - totalPanier).toFixed(2)}€ !).`);
+        afficherNotification(`Pour ${villeChoisie}, min. ${minRequis}€ (Il manque ${(minRequis - totalPanier).toFixed(2)}€ !).`);
         return false;
     }
     return true;
@@ -633,13 +624,13 @@ function ajouterPizzaCustom(e) {
     panier.push({ nom: nomCustom, prix: prixCustom, prixOriginal: prixCustom, options: ingredientsListe });
     mettreAJourPanier();
     fermerPizzaBuilder();
-    afficherNotification("✓ Votre pizza sur-mesure a été ajoutée !");
+    afficherNotification("Votre pizza sur-mesure a été ajoutée !");
 }
 
 function ajouterUpselling(nomProduit, prixProduit) {
     panier.push({ nom: nomProduit + " (Offre Flash)", prix: prixProduit, prixOriginal: prixProduit, options: [] });
     mettreAJourPanier();
-    afficherNotification(`✓ ${nomProduit} ajouté à prix réduit !`);
+    afficherNotification(`${nomProduit} ajouté à prix réduit !`);
     const box = document.getElementById('upselling-box');
     if (box) box.style.display = 'none';
 }
@@ -674,23 +665,23 @@ function mettreAJourVisuelTracker(statutAdmin) {
 
     if (statut.includes('préparation') || statut.includes('preparation') || statut.includes('cours')) {
         document.getElementById('step-2').style.color = "var(--success)";
-        document.getElementById('step-2').innerHTML = "&#10004; En cours de préparation";
+        document.getElementById('step-2').innerHTML = "En cours de préparation";
     }
     
     if (statut.includes('four')) {
         document.getElementById('step-2').style.color = "var(--success)";
-        document.getElementById('step-2').innerHTML = "&#10004; En cours de préparation";
+        document.getElementById('step-2').innerHTML = "En cours de préparation";
         document.getElementById('step-3').style.color = "var(--success)";
-        document.getElementById('step-3').innerHTML = "&#10004; Au four";
+        document.getElementById('step-3').innerHTML = "Au four";
     }
     
     if (statut.includes('prêt') || statut.includes('prete') || statut.includes('prête') || statut.includes('livré') || statut.includes('livree')) {
         document.getElementById('step-2').style.color = "var(--success)";
-        document.getElementById('step-2').innerHTML = "&#10004; En cours de préparation";
+        document.getElementById('step-2').innerHTML = "En cours de préparation";
         document.getElementById('step-3').style.color = "var(--success)";
-        document.getElementById('step-3').innerHTML = "&#10004; Au four";
+        document.getElementById('step-3').innerHTML = "Au four";
         document.getElementById('step-4').style.color = "var(--success)";
-        document.getElementById('step-4').innerHTML = "&#10004; Prête !";
+        document.getElementById('step-4').innerHTML = "Prête !";
         
         if (intervalSuivi) clearInterval(intervalSuivi);
     }
@@ -750,13 +741,13 @@ function toggleDarkMode() {
     document.body.classList.toggle('dark-mode');
     const btn = document.getElementById('dark-btn');
     if (document.body.classList.contains('dark-mode')) {
-        if (btn) btn.innerHTML = "☀️ Mode Jour";
+        if (btn) btn.innerHTML = "☀️";
         localStorage.setItem('pizzaTownTheme', 'dark');
-        mettreAJourUICompte(); // Force update color of user button
+        mettreAJourUICompte(); 
     } else {
-        if (btn) btn.innerHTML = "🌙 Mode Nuit";
+        if (btn) btn.innerHTML = "🌙";
         localStorage.setItem('pizzaTownTheme', 'light');
-        mettreAJourUICompte(); // Force update color of user button
+        mettreAJourUICompte(); 
     }
 }
 
@@ -767,10 +758,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (localStorage.getItem('pizzaTownTheme') === 'dark') {
         document.body.classList.add('dark-mode');
         const btn = document.getElementById('dark-btn');
-        if(btn) btn.innerHTML = "☀️ Mode Jour";
+        if(btn) btn.innerHTML = "☀️";
     }
     
-    // Met à jour le bouton Mon Compte au lancement
     mettreAJourUICompte();
 
     const slides = document.querySelectorAll(".carousel-slide");
@@ -813,12 +803,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnPayer && modalCheckout) {
         btnPayer.onclick = () => {
             if (!verifierSiOuvert()) {
-                afficherNotification("💤 Pizza Town est actuellement fermé. Réouverture prochaine !");
+                afficherNotification("Pizza Town est actuellement fermé. Réouverture prochaine !");
                 return;
             }
-            if (panier.length === 0) { afficherNotification("⚠️ Votre panier est vide !"); return; }
+            if (panier.length === 0) { afficherNotification("Votre panier est vide !"); return; }
             
-            // AUTO-REMPLISSAGE DU CHECKOUT SI CLIENT CONNECTÉ
             if (currentUser) {
                 if(document.getElementById('nom-client')) document.getElementById('nom-client').value = currentUser.nom || '';
                 if(document.getElementById('tel-client')) document.getElementById('tel-client').value = currentUser.telephone || '';
@@ -849,10 +838,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (modeCommandeActuel === 'livraison') {
-                if (!ville || !adressePrecise) { afficherNotification("⚠️ Veuillez renseigner la ville et l'adresse précise."); return; }
+                if (!ville || !adressePrecise) { afficherNotification("Veuillez renseigner la ville et l'adresse précise."); return; }
                 if (!validerCommande(ville, totalCalculé)) return; 
             } else {
-                if (!heureRetrait) { afficherNotification("⚠️ Veuillez indiquer une heure de retrait."); return; }
+                if (!heureRetrait) { afficherNotification("Veuillez indiquer une heure de retrait."); return; }
             }
 
             const adresseComplete = modeCommandeActuel === 'livraison' 
@@ -869,7 +858,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 heureRetrait: modeCommandeActuel === 'emporter' ? heureRetrait : 'Immédiat'
             };
             
-            // LIAISON AVEC LE COMPTE CLIENT
             if (currentUser && currentUser._id) {
                 nouvelleCommande.userId = currentUser._id;
             }
@@ -895,11 +883,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     lancerTrackerDeCommande(commandeEnregistree._id);
                     
                 } else {
-                    afficherNotification("❌ Erreur lors de la validation.");
+                    afficherNotification("Erreur lors de la validation.");
                 }
             } catch (err) {
                 console.error("Erreur réseau :", err);
-                afficherNotification("❌ Impossible de contacter le serveur de la pizzeria.");
+                afficherNotification("Impossible de contacter le serveur de la pizzeria.");
             }
         };
     }

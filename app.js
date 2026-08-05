@@ -413,12 +413,12 @@ async function chargerHistoriqueClient() {
     conteneur.innerHTML = '<p style="color: #888; font-style: italic; text-align: center; padding: 10px;">Chargement de vos commandes...</p>';
     
     try {
-        const res = await fetch(`${API_URL}/api/orders`);
+        // LE CORRECTIF EST LÀ : on ajoute ?t=timestamp pour empêcher le navigateur de cacher la réponse
+        const res = await fetch(`${API_URL}/api/orders?t=${new Date().getTime()}`, { cache: 'no-store' });
         const allOrders = await res.json();
         
         console.log("Mon ID Client :", currentUser._id);
         
-        // LA LIGNE MAGIQUE CORRIGÉE : On utilise String() pour garantir la correspondance
         const mesCommandes = allOrders.filter(cmd => cmd.userId && String(cmd.userId) === String(currentUser._id));
         
         if (mesCommandes.length === 0) {
@@ -428,13 +428,17 @@ async function chargerHistoriqueClient() {
         
         conteneur.innerHTML = ''; 
         
-        // On affiche les commandes de la plus récente à la plus ancienne avec .reverse()
         mesCommandes.reverse().forEach(cmd => {
             const dateStr = new Date(cmd.createdAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute:'2-digit' });
             
             const estLivree = (cmd.status && cmd.status.toLowerCase().includes('livré'));
-            const couleurBadge = estLivree ? '#2a9d8f' : '#f39c12';
-            const texteBadge = estLivree ? 'Terminée' : (cmd.status || 'En cours');
+            
+            // LA GESTION DES COULEURS EST LÀ
+            let couleurBadge = '#3498db'; // Bleu par défaut (En préparation)
+            if (cmd.status === 'En attente') couleurBadge = '#f39c12'; // Orange
+            if (estLivree) couleurBadge = '#2a9d8f'; // Vert
+            
+            const texteBadge = estLivree ? 'Terminée' : (cmd.status || 'En attente');
             
             const div = document.createElement('div');
             div.style.cssText = "border: 1px solid #eaeaea; padding: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; background: white; margin-bottom: 10px; transition: 0.2s;";
